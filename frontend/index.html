@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function(){
+        var t=localStorage.getItem('mobile-mechanic-theme');
+        if(t==='light')document.documentElement.setAttribute('data-theme','light');
+        else if(t==='dark')document.documentElement.setAttribute('data-theme','dark');
+        else if(t==='system'||!t)document.documentElement.setAttribute('data-theme',matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+      })();
+    </script>
+    <link rel="icon" href="/pwa-192.png" />
+    <link rel="apple-touch-icon" href="/pwa-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0ea5e9" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Mobile Mechanic" />
+    <title>Mobile Mechanic - Find Mechanics Nearby</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

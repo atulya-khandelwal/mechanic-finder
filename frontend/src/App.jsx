@@ -1,0 +1,84 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { LocationProvider } from './context/LocationContext';
+import { ThemeProvider } from './context/ThemeContext';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import UserDashboard from './pages/UserDashboard';
+import MechanicDashboard from './pages/MechanicDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import LocationGate from './pages/LocationGate';
+import './App.css';
+
+function PrivateRoute({ children, allowedRoles }) {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="loading">Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    const redirect = user.role === 'admin' ? '/admin' : user.role === 'mechanic' ? '/mechanic' : '/user';
+    return <Navigate to={redirect} replace />;
+  }
+  return children;
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route
+        path="/admin"
+        element={
+          <PrivateRoute allowedRoles={['admin']}>
+            <AdminDashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/mechanic"
+        element={
+          <PrivateRoute allowedRoles={['mechanic']}>
+            <MechanicDashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/user"
+        element={
+          <PrivateRoute allowedRoles={['user']}>
+            <LocationGate>
+              <UserDashboard />
+            </LocationGate>
+          </PrivateRoute>
+        }
+      />
+      <Route path="/" element={<NavigateToRole />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function NavigateToRole() {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="loading">Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === 'admin') return <Navigate to="/admin" replace />;
+  if (user.role === 'mechanic') return <Navigate to="/mechanic" replace />;
+  return <Navigate to="/user" replace />;
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <LocationProvider>
+            <div className="app">
+              <AppRoutes />
+            </div>
+          </LocationProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
+  );
+}

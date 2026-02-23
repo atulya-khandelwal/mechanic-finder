@@ -1,0 +1,45 @@
+/* Theme variables - Light & Dark (default: dark) */
+:root,
+[data-theme="dark"] {
+  --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  --bg-card: #1e293b;
+  --bg-card-alt: rgba(30, 41, 59, 0.9);
+  --bg-input: #1e293b;
+  --bg-input-alt: #0f172a;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: #334155;
+  --border-light: #475569;
+  --accent: #0ea5e9;
+  --accent-hover: #38bdf8;
+  --accent-text: #0f172a;
+  --overlay: rgba(0, 0, 0, 0.7);
+  --tab-bg: #334155;
+  --tab-active-bg: #0ea5e9;
+  --tab-active-text: #0f172a;
+  --error: #f87171;
+  --success: #22c55e;
+}
+
+[data-theme="light"] {
+  --bg-body: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f8fafc 100%);
+  --bg-card: #ffffff;
+  --bg-card-alt: rgba(255, 255, 255, 0.95);
+  --bg-input: #f8fafc;
+  --bg-input-alt: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --border-light: #cbd5e1;
+  --accent: #0284c7;
+  --accent-hover: #0ea5e9;
+  --accent-text: #ffffff;
+  --overlay: rgba(0, 0, 0, 0.5);
+  --tab-bg: #e2e8f0;
+  --tab-active-bg: #0284c7;
+  --tab-active-text: #ffffff;
+  --error: #dc2626;
+  --success: #16a34a;
+}
