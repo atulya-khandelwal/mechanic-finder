@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, NavLink, useLocation } from 'react-router-dom';
 import { useLocation as useLoc } from '../context/LocationContext';
-import { auth, mechanics, services, bookings, upload, reviews, ai } from '../api';
+import { auth, mechanics, services, bookings, upload, reviews, ai, resolvePublicUrl } from '../api';
 import BookingChat from '../components/BookingChat';
 import BookingsPaginationBar, { BOOKINGS_PAGE_SIZE } from '../components/BookingsPaginationBar';
 import NotificationPrompt from '../components/NotificationPrompt';
@@ -733,7 +733,9 @@ export default function UserDashboard() {
                 <h4>Vehicle Details</h4>
                 <label>Vehicle Image</label>
                 <input type="file" accept="image/*" onChange={handleImageChange} />
-                {vehicleImageUrl && <img src={vehicleImageUrl} alt="Vehicle" className="vehicle-preview" />}
+                {vehicleImageUrl && (
+                  <img src={resolvePublicUrl(vehicleImageUrl)} alt="Vehicle" className="vehicle-preview" />
+                )}
                 <input placeholder="Vehicle Number (Plate)" value={vehicleNumber} onChange={(e) => setVehicleNumber(e.target.value)} required />
                 <input placeholder="Make (e.g. Honda, Toyota)" value={vehicleMake} onChange={(e) => setVehicleMake(e.target.value)} />
                 <input placeholder="Model (e.g. Civic, Camry)" value={vehicleModel} onChange={(e) => setVehicleModel(e.target.value)} />

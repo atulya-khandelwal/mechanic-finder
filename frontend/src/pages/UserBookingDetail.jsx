@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { bookings, payments } from '../api';
+import { bookings, payments, resolvePublicUrl } from '../api';
 import BookingChat from '../components/BookingChat';
 import { humanizeBookingStatus } from '../utils/bookingStatus';
 import { useAuth } from '../context/AuthContext';
@@ -207,7 +207,9 @@ export default function UserBookingDetail({ bookingId, onLeaveReview }) {
           {(booking.vehicle_make || booking.vehicle_model) && (
             <p>{[booking.vehicle_make, booking.vehicle_model, booking.vehicle_year].filter(Boolean).join(' ')}</p>
           )}
-          {booking.vehicle_image && <img src={booking.vehicle_image} alt="Vehicle" className="booking-detail-vehicle-img" />}
+          {booking.vehicle_image && (
+            <img src={resolvePublicUrl(booking.vehicle_image)} alt="Vehicle" className="booking-detail-vehicle-img" />
+          )}
         </div>
 
         <div className="booking-detail-card booking-detail-card--wide">

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { auth, upload } from '../api';
+import { auth, upload, resolvePublicUrl } from '../api';
 
 function initialsFromName(name) {
   const parts = String(name || '')
@@ -59,7 +59,7 @@ export default function ProfilePhotoField({ user, onUpdated }) {
       <div className="mws-profile-photo-row">
         <div className="mws-profile-avatar" aria-hidden>
           {user?.profile_photo ? (
-            <img src={user.profile_photo} alt="" />
+            <img src={resolvePublicUrl(user.profile_photo)} alt="" />
           ) : (
             <span className="mws-profile-avatar-placeholder">{initialsFromName(user?.full_name)}</span>
           )}

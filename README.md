@@ -77,11 +77,15 @@ Use `npm start` if `node --watch` hits file-watcher limits on your machine.
 
 ```bash
 cd frontend
+cp .env.example .env
+# Optional: see frontend/.env.example for VITE_* variables
 npm install
 npm run dev
 ```
 
-Dev server defaults to **http://localhost:5173** (Vite). In `vite.config.js`, `/api` and `/uploads` are **proxied to port 3001**. The backend must be running or the browser will see proxy errors (`ECONNREFUSED`).
+Dev server defaults to **http://localhost:5173** (Vite). In `vite.config.js`, `/api` and `/uploads` are **proxied** to `VITE_DEV_PROXY_TARGET` or `http://localhost:3001`. The backend must be running or the browser will see proxy errors (`ECONNREFUSED`).
+
+**Production / staging API URL:** set `VITE_API_BASE_URL` in `frontend/.env.production` (or your host’s env) to your public API origin, e.g. `https://api.yourdomain.com`. The app builds that into `src/apiConfig.js` so you do not edit URLs by hand between environments. Leave it unset for local dev (relative `/api` + proxy).
 
 If you use ngrok or another tunnel, point it at the Vite port you actually use (e.g. 5173 or 5174) and add the host to `allowedHosts` in `vite.config.js` if required.
 
@@ -109,6 +113,19 @@ Copy `backend/.env.example` to `backend/.env` and fill in what you need. Importa
 | Payments | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` |
 
 Never commit real secrets. Use test keys for Razorpay and Twilio in development.
+
+## Environment variables (frontend)
+
+Copy `frontend/.env.example` to `frontend/.env` for local overrides. For production builds, use `frontend/.env.production` or your host’s dashboard.
+
+| Variable | Purpose |
+|----------|---------|
+| `VITE_API_BASE_URL` | Optional. Public API origin when the SPA and API are on **different** hosts (e.g. `https://api.example.com`). Omitted in dev → relative `/api` + Vite proxy. |
+| `VITE_DEV_PROXY_TARGET` | Dev only. Where Vite proxies `/api` and `/uploads` (default `http://localhost:3001`). |
+| `VITE_MAPBOX_ACCESS_TOKEN` | Mapbox (see `.env.example`). |
+| `VITE_DEFAULT_PHONE_REGION` | Default phone region for validation. |
+
+`VITE_*` values are baked in at **build time** for production; change them and rebuild to switch API URLs.
 
 ## API overview
 

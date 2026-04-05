@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { resolvePublicUrl } from '../api';
 
 function initialsFromName(name) {
   const parts = String(name || '')
@@ -24,7 +25,7 @@ export default function HeaderProfileAvatar({ user, to, onNavigate }) {
       onClick={() => onNavigate?.()}
     >
       {showImg ? (
-        <img src={user.profile_photo} alt="" onError={() => setImgErr(true)} />
+        <img src={resolvePublicUrl(user.profile_photo)} alt="" onError={() => setImgErr(true)} />
       ) : (
         <span className="mws-header-avatar-placeholder" aria-hidden>
           {initials}

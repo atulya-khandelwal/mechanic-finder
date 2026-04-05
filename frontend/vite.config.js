@@ -1,9 +1,13 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const proxyTarget = env.VITE_DEV_PROXY_TARGET || 'http://localhost:3001'
+
+  return {
   plugins: [
     react(),
     VitePWA({
@@ -54,8 +58,8 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '/api': 'http://localhost:3001',
-      '/uploads': 'http://localhost:3001',
+      '/api': proxyTarget,
+      '/uploads': proxyTarget,
     },
     // Host header must match; ngrok (and other tunnels) use random subdomains each session.
     // Use hostname only — not https:// or trailing slashes.
@@ -67,4 +71,5 @@ export default defineConfig({
       '.ngrok.io',
     ],
   },
+  }
 })

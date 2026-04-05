@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { bookings } from '../api';
+import { bookings, resolvePublicUrl } from '../api';
 import BookingChat from '../components/BookingChat';
 import { mechanicJobStatusPresentation } from '../utils/bookingStatus';
 
@@ -213,7 +213,7 @@ export default function MechanicJobDetail({ bookingId, onRefresh }) {
               )}
             </dl>
             {booking.vehicle_image && (
-              <img src={booking.vehicle_image} alt="Customer vehicle" className="booking-detail-vehicle-img" />
+              <img src={resolvePublicUrl(booking.vehicle_image)} alt="Customer vehicle" className="booking-detail-vehicle-img" />
             )}
           </div>
         )}
