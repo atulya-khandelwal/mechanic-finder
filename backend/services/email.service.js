@@ -9,13 +9,24 @@ export async function sendEmail({ to, subject, html }) {
   if (!transport) {
     throw new Error('SMTP transport is not available');
   }
-  const info = await transport.sendMail({
-    from: config.smtpFrom,
-    to,
-    subject,
-    html,
-  });
-  return info;
+  try {
+    const info = await transport.sendMail({
+      from: config.smtpFrom,
+      to,
+      subject,
+      html,
+    });
+    return info;
+  } catch (err) {
+    console.error('[SMTP] sendMail failed', {
+      host: config.smtp.host,
+      port: config.smtp.port,
+      secure: config.smtp.secure,
+      code: err.code,
+      message: err.message,
+    });
+    throw err;
+  }
 }
 
 /**

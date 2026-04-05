@@ -1,7 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import { config } from './config.js';
 import authRoutes from './routes/auth.js';
 import mechanicsRoutes from './routes/mechanics.js';
@@ -16,12 +14,10 @@ import emailRoutes from './routes/email.routes.js';
 import aiRoutes from './routes/ai.js';
 import paymentRoutes from './routes/payments.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.use(cors({ origin: true }));
 app.use(express.json());
-app.use('/uploads', express.static(join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/mechanics', mechanicsRoutes);

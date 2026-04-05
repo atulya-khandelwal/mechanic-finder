@@ -59,7 +59,6 @@ export default defineConfig(({ mode }) => {
   server: {
     proxy: {
       '/api': proxyTarget,
-      '/uploads': proxyTarget,
     },
     // Host header must match; ngrok (and other tunnels) use random subdomains each session.
     // Use hostname only — not https:// or trailing slashes.

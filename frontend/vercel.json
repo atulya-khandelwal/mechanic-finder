@@ -1,7 +1,6 @@
 {
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://mechanic-finder-x56w.onrender.com/api/:path*" },
-    { "source": "/uploads/:path*", "destination": "https://mechanic-finder-x56w.onrender.com/uploads/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

@@ -1,6 +1,6 @@
 import { API } from './apiConfig.js';
 
-export { resolvePublicUrl, getPublicApiOrigin, getApiBase } from './apiConfig.js';
+export { resolvePublicUrl, getApiBase } from './apiConfig.js';
 
 function getHeaders() {
   const token = localStorage.getItem('token');

@@ -23,31 +23,10 @@ if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE_URL) {
 }
 
 /**
- * When `API` is absolute, returns that server origin for resolving relative `/uploads/...` paths.
- * When `API` is relative (`/api`), returns "" (browser uses same origin as the SPA).
- */
-export function getPublicApiOrigin() {
-  const base = API;
-  if (base.startsWith('http')) {
-    try {
-      return new URL(base).origin;
-    } catch {
-      return '';
-    }
-  }
-  return '';
-}
-
-/**
- * Turn a possibly relative upload path into an absolute URL when the API is on another host.
- * Absolute URLs and Cloudinary URLs are returned unchanged.
+ * Image URLs from the API are Cloudinary HTTPS URLs. Passthrough for safety (null, relative, etc.).
  */
 export function resolvePublicUrl(url) {
   if (url == null || typeof url !== 'string') return url;
   if (/^https?:\/\//i.test(url)) return url;
-  if (url.startsWith('/uploads')) {
-    const origin = getPublicApiOrigin();
-    if (origin) return `${origin}${url}`;
-  }
   return url;
 }

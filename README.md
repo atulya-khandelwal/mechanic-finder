@@ -6,7 +6,7 @@ A web app that connects customers with mobile mechanics: location-based discover
 
 - **Location**: Find mechanics within 10 km (browser geolocation or manual coordinates).
 - **Service types**: Emergency (e.g. breakdown, flat tire, battery) and scheduled (e.g. oil change, brakes, cleaning).
-- **Bookings**: Vehicle details, photos (local uploads or Cloudinary), chat per booking, status workflow (pending → accepted → in progress → completed).
+- **Bookings**: Vehicle details, photos (Cloudinary), chat per booking, status workflow (pending → accepted → in progress → completed).
 - **Auth**: Email + SMS OTP signup (`/register/start` → `/register/verify`), JWT login, roles: `user`, `mechanic`, `admin`.
 - **Payments (INR)**: Cash on delivery (default) or pay online with Razorpay from booking details; mechanics can confirm cash received after the job is completed.
 - **AI triage (optional)**: Groq-powered suggestion of service category and safety tips from a free-text problem description (requires `GROQ_API_KEY`).
@@ -29,7 +29,7 @@ A web app that connects customers with mobile mechanics: location-based discover
 
 - Node.js 20+
 - PostgreSQL
-- Optional: Cloudinary, Twilio, Razorpay, Groq, SMTP — see `backend/.env.example`
+- Cloudinary (required for image uploads); optional: Twilio, Razorpay, Groq, SMTP — see `backend/.env.example`
 
 ## Quick start
 
@@ -83,7 +83,7 @@ npm install
 npm run dev
 ```
 
-Dev server defaults to **http://localhost:5173** (Vite). In `vite.config.js`, `/api` and `/uploads` are **proxied** to `VITE_DEV_PROXY_TARGET` or `http://localhost:3001`. The backend must be running or the browser will see proxy errors (`ECONNREFUSED`).
+Dev server defaults to **http://localhost:5173** (Vite). In `vite.config.js`, `/api` is **proxied** to `VITE_DEV_PROXY_TARGET` or `http://localhost:3001`. The backend must be running or the browser will see proxy errors (`ECONNREFUSED`).
 
 **Production / staging API URL:** set `VITE_API_BASE_URL` in `frontend/.env.production` (or your host’s env) to your public API origin, e.g. `https://api.yourdomain.com`. The app builds that into `src/apiConfig.js` so you do not edit URLs by hand between environments. Leave it unset for local dev (relative `/api` + proxy).
 
@@ -108,7 +108,7 @@ Copy `backend/.env.example` to `backend/.env` and fill in what you need. Importa
 | Email OTP | `SMTP_*`, `OTP_*` |
 | Phone SMS | `TWILIO_*`, `DEFAULT_PHONE_REGION`, `PHONE_VERIFY_SKIP` (dev only) |
 | Push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` |
-| Images | `CLOUDINARY_*` or local `backend/uploads` |
+| Images | `CLOUDINARY_URL` (or `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`) — required for uploads |
 | AI triage | `GROQ_API_KEY`, `GROQ_MODEL` |
 | Payments | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` |
 
@@ -121,7 +121,7 @@ Copy `frontend/.env.example` to `frontend/.env` for local overrides. For product
 | Variable | Purpose |
 |----------|---------|
 | `VITE_API_BASE_URL` | Optional. Public API origin when the SPA and API are on **different** hosts (e.g. `https://api.example.com`). Omitted in dev → relative `/api` + Vite proxy. |
-| `VITE_DEV_PROXY_TARGET` | Dev only. Where Vite proxies `/api` and `/uploads` (default `http://localhost:3001`). |
+| `VITE_DEV_PROXY_TARGET` | Dev only. Where Vite proxies `/api` (default `http://localhost:3001`). |
 | `VITE_MAPBOX_ACCESS_TOKEN` | Mapbox (see `.env.example`). |
 | `VITE_DEFAULT_PHONE_REGION` | Default phone region for validation. |
 

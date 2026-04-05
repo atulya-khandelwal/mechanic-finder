@@ -177,7 +177,7 @@ router.patch('/profile', authenticate, async (req, res) => {
       const raw = cleared ? null : String(profilePhoto).trim();
       if (raw !== null && !isAllowedStoredImageUrl(raw)) {
         return res.status(400).json({
-          error: 'Profile photo must be a Cloudinary image URL or a path under /uploads/',
+          error: 'Profile photo must be a Cloudinary image URL (https://res.cloudinary.com/...)',
         });
       }
       updates.push(`profile_photo = $${i++}`);
