@@ -11,7 +11,12 @@ import HeaderProfileAvatar from '../components/HeaderProfileAvatar';
 import { useMechanicBookingsPolling } from '../hooks/useBookingsPolling';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import MechanicJobDetail from './MechanicJobDetail';
-import { humanizeBookingStatus, isInFlightBooking } from '../utils/bookingStatus';
+import {
+  humanizeBookingStatus,
+  isInFlightBooking,
+  jobNeedsPayment,
+  mechanicJobStatusPresentation,
+} from '../utils/bookingStatus';
 import {
   validatePhoneInput,
   isIndiaDefaultRegion,
@@ -276,7 +281,12 @@ export default function MechanicDashboard() {
     () => myBookings.filter((b) => isInFlightBooking(b.status)),
     [myBookings]
   );
-  const hasCurrentActivity = availableJobs.length > 0 || inFlightMyJobs.length > 0;
+  const awaitingPaymentJobs = useMemo(
+    () => myBookings.filter((b) => jobNeedsPayment(b)),
+    [myBookings]
+  );
+  const hasCurrentActivity =
+    availableJobs.length > 0 || inFlightMyJobs.length > 0 || awaitingPaymentJobs.length > 0;
 
   const sortedAvailableJobs = useMemo(() => {
     let list = availableJobs.filter((b) => {
@@ -314,7 +324,10 @@ export default function MechanicDashboard() {
       }
     }
     const ta = (x) => new Date(x.created_at).getTime();
+    const payRank = (b) => (jobNeedsPayment(b) ? 0 : 1);
     list.sort((a, b) => {
+      const pr = payRank(a) - payRank(b);
+      if (pr !== 0) return pr;
       switch (myJobsSort) {
         case 'date_desc':
           return ta(b) - ta(a);
@@ -461,8 +474,39 @@ export default function MechanicDashboard() {
           <section className="mws-section mws-current-strip" aria-label="Current requests">
             <h2 className="mws-block-title">Current requests</h2>
             <p className="mws-muted mws-block-desc mws-current-strip-desc">
-              Open pool jobs and your active work stay here until completed, rejected, or cancelled.
+              Jobs with payment still due stay at the top. Open pool work and in-progress jobs stay here until finished or cancelled.
             </p>
+            {awaitingPaymentJobs.length > 0 && (
+              <div className="mws-current-group mws-current-group--payment">
+                <h3 className="mws-current-subtitle">Awaiting payment</h3>
+                <p className="mws-muted mws-current-payment-hint">
+                  These jobs are complete but not paid yet. After the customer pays online or you confirm cash, they move to Successful.
+                </p>
+                <ul className="mws-current-list">
+                  {awaitingPaymentJobs.map((b) => (
+                    <li key={b.id}>
+                      <button
+                        type="button"
+                        className="mws-current-row mws-current-row--payment-due"
+                        onClick={() => navigate(`/mechanic/jobs/${b.id}`)}
+                      >
+                        <div className="mws-current-row-main">
+                          <strong>{b.category_name}</strong>
+                          <span className="badge awaiting-payment">Awaiting payment</span>
+                          <span className="mws-current-dim">{b.user_name}</span>
+                          {b.total_price != null && (
+                            <span className="mws-current-amount">{fmtMoney(b.total_price)}</span>
+                          )}
+                        </div>
+                        <span className="mws-current-chevron" aria-hidden>
+                          Collect / confirm →
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {availableJobs.length > 0 && (
               <div className="mws-current-group">
                 <h3 className="mws-current-subtitle">Open near you</h3>
@@ -706,15 +750,18 @@ export default function MechanicDashboard() {
                       </select>
                     </div>
                   </div>
+                  <p className="mws-muted mws-jobs-sort-hint">Jobs awaiting payment stay at the top until paid.</p>
                   <div className="mws-booking-list">
                     {processedMyJobs.length === 0 ? (
                       <p className="mws-muted mws-jobs-empty">No jobs match your filters.</p>
                     ) : (
-                      pagedMyJobs.map((b) => (
+                      pagedMyJobs.map((b) => {
+                        const st = mechanicJobStatusPresentation(b);
+                        return (
                         <div key={b.id} className="booking-card clickable mws-booking-card" onClick={() => navigate(`/mechanic/jobs/${b.id}`)}>
                           <div className="mws-bc-main">
                             <strong>{b.category_name}</strong>
-                            <span className={`badge ${b.status}`}>{humanizeBookingStatus(b.status)}</span>
+                            <span className={st.className}>{st.text}</span>
                             <span>{b.user_name} · {b.user_phone}</span>
                             <span className="mws-bc-dim">{b.user_address || `${b.user_latitude}, ${b.user_longitude}`}</span>
                             <span className="mws-bc-dim">{new Date(b.created_at).toLocaleString()}</span>
@@ -746,7 +793,8 @@ export default function MechanicDashboard() {
                           </div>
                           <span className="tap-hint">{b.status === 'rejected' ? 'Details' : 'Details & chat'}</span>
                         </div>
-                      ))
+                        );
+                      })
                     )}
                   </div>
                   {processedMyJobs.length > 0 && (

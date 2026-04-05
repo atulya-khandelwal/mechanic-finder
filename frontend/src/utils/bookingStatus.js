@@ -15,3 +15,29 @@ export function humanizeBookingStatus(status) {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(' ');
 }
+
+/** Completed job where money is not yet recorded (online or COD). */
+export function jobNeedsPayment(booking) {
+  if (!booking || booking.status !== 'completed') return false;
+  return booking.payment_status !== 'paid';
+}
+
+/** Completed job with payment settled — mechanic can treat as fully closed. */
+export function jobIsSuccessful(booking) {
+  if (!booking || booking.status !== 'completed') return false;
+  return booking.payment_status === 'paid';
+}
+
+/**
+ * Mechanic list/detail: completed jobs show Awaiting payment vs Successful instead of raw "Completed".
+ */
+export function mechanicJobStatusPresentation(booking) {
+  if (!booking) return { text: '', className: 'badge' };
+  if (booking.status === 'completed') {
+    if (jobNeedsPayment(booking)) {
+      return { text: 'Awaiting payment', className: 'badge awaiting-payment' };
+    }
+    return { text: 'Successful', className: 'badge successful' };
+  }
+  return { text: humanizeBookingStatus(booking.status), className: `badge ${booking.status}` };
+}

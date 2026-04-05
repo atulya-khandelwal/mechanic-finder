@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { bookings } from '../api';
 import BookingChat from '../components/BookingChat';
-import { humanizeBookingStatus } from '../utils/bookingStatus';
+import { mechanicJobStatusPresentation } from '../utils/bookingStatus';
 
 const CURRENCY = '₹';
 
@@ -93,6 +93,7 @@ export default function MechanicJobDetail({ bookingId, onRefresh }) {
   }
 
   const isOpenPool = !booking.mechanic_id && booking.status === 'pending';
+  const statusBadge = mechanicJobStatusPresentation(booking);
 
   return (
     <section className="booking-detail-page booking-detail-page--mechanic" aria-label="Job details">
@@ -109,7 +110,7 @@ export default function MechanicJobDetail({ bookingId, onRefresh }) {
           {booking.category_type && <p className="booking-detail-sub">{booking.category_type}</p>}
         </div>
         <div className="booking-detail-header-aside">
-          <span className={`badge ${booking.status}`}>{humanizeBookingStatus(booking.status)}</span>
+          <span className={statusBadge.className}>{statusBadge.text}</span>
           {booking.distance_km != null && (
             <span className="booking-detail-pill">{Number(booking.distance_km).toFixed(1)} km</span>
           )}

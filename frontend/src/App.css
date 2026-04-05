@@ -2185,6 +2185,48 @@ textarea {
   background: color-mix(in srgb, var(--accent) 6%, var(--bg-card));
 }
 
+.mechanic-workspace .mws-current-row--payment-due {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, #f59e0b 50%, var(--border));
+  background: color-mix(in srgb, #f59e0b 10%, var(--bg-card));
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.mechanic-workspace .mws-current-row--payment-due:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 4px 14px color-mix(in srgb, #f59e0b 15%, transparent);
+}
+
+.mechanic-workspace .mws-current-amount {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.mechanic-workspace .mws-current-payment-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.mechanic-workspace .mws-current-group--payment {
+  margin-bottom: 1.25rem;
+}
+
+.mechanic-workspace .mws-jobs-sort-hint {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.82rem;
+}
+
 .mechanic-workspace .mws-current-row-main {
   display: flex;
   flex-direction: column;
@@ -3328,6 +3370,24 @@ textarea {
 .mechanic-workspace .badge.rejected {
   background: color-mix(in srgb, var(--text-muted) 22%, var(--bg-card));
   color: var(--text-secondary);
+}
+
+.mechanic-workspace .badge.awaiting-payment {
+  background: color-mix(in srgb, #f59e0b 26%, var(--bg-card));
+  color: #b45309;
+}
+
+[data-theme='dark'] .mechanic-workspace .badge.awaiting-payment {
+  color: #fcd34d;
+}
+
+.mechanic-workspace .badge.successful {
+  background: color-mix(in srgb, #22c55e 22%, var(--bg-card));
+  color: #15803d;
+}
+
+[data-theme='dark'] .mechanic-workspace .badge.successful {
+  color: #86efac;
 }
 
 /* Full-page booking detail (mechanic & user) */
