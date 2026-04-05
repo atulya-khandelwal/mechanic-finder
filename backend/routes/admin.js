@@ -1,7 +1,9 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import { query, pool } from '../db.js';
+import { config } from '../config.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
+import { normalizeToE164 } from '../services/phone.util.js';
 
 const router = express.Router();
 
@@ -23,20 +25,30 @@ router.get('/users', async (req, res) => {
 router.post('/users', async (req, res) => {
   try {
     const { email, password, fullName, phone } = req.body;
-    if (!email || !password || !fullName) {
-      return res.status(400).json({ error: 'Email, password, and full name are required' });
+    if (!email || !password || !fullName || !phone || !String(phone).trim()) {
+      return res.status(400).json({ error: 'Email, password, full name, and phone are required' });
+    }
+    let normalizedPhone;
+    try {
+      normalizedPhone = normalizeToE164(phone, config.defaultPhoneRegion);
+    } catch (e) {
+      return res.status(400).json({ error: e.message || 'Invalid phone number' });
     }
     const hashed = await bcrypt.hash(password, 10);
     const r = await query(
       `INSERT INTO users (email, password_hash, full_name, phone, role)
        VALUES ($1, $2, $3, $4, 'user')
        RETURNING id, email, full_name, phone, role, created_at`,
-      [email, hashed, fullName, phone || null]
+      [email, hashed, fullName, normalizedPhone]
     );
     res.status(201).json(r.rows[0]);
   } catch (err) {
     if (err.code === '23505') {
-      const msg = err.constraint === 'users_phone_key' ? 'Phone number already registered' : 'Email already registered';
+      const c = String(err.constraint || '');
+      const msg =
+        c.includes('phone') || String(err.detail || '').includes('(phone)')
+          ? 'Phone number already registered'
+          : 'Email already registered';
       return res.status(400).json({ error: msg });
     }
     console.error(err);
@@ -62,8 +74,14 @@ router.get('/mechanics', async (req, res) => {
 router.post('/mechanics', async (req, res) => {
   try {
     const { email, password, fullName, phone, latitude, longitude, address, specialization, hourlyRate } = req.body;
-    if (!email || !password || !fullName) {
-      return res.status(400).json({ error: 'Email, password, and full name are required' });
+    if (!email || !password || !fullName || !phone || !String(phone).trim()) {
+      return res.status(400).json({ error: 'Email, password, full name, and phone are required' });
+    }
+    let normalizedPhone;
+    try {
+      normalizedPhone = normalizeToE164(phone, config.defaultPhoneRegion);
+    } catch (e) {
+      return res.status(400).json({ error: e.message || 'Invalid phone number' });
     }
     const hashed = await bcrypt.hash(password, 10);
     const client = await pool.connect();
@@ -72,7 +90,7 @@ router.post('/mechanics', async (req, res) => {
         `INSERT INTO users (email, password_hash, full_name, phone, role)
          VALUES ($1, $2, $3, $4, 'mechanic')
          RETURNING id`,
-        [email, hashed, fullName, phone || null]
+        [email, hashed, fullName, normalizedPhone]
       );
       const userId = userResult.rows[0].id;
       await client.query(
@@ -90,7 +108,11 @@ router.post('/mechanics', async (req, res) => {
     }
   } catch (err) {
     if (err.code === '23505') {
-      const msg = err.constraint === 'users_phone_key' ? 'Phone number already registered' : 'Email already registered';
+      const c = String(err.constraint || '');
+      const msg =
+        c.includes('phone') || String(err.detail || '').includes('(phone)')
+          ? 'Phone number already registered'
+          : 'Email already registered';
       return res.status(400).json({ error: msg });
     }
     console.error(err);

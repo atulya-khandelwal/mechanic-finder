@@ -19,16 +19,20 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const login = async (email, password) => {
-    const { token } = await authApi.login(email, password);
+  const login = async (loginIdentifier, password) => {
+    const { token } = await authApi.login(loginIdentifier, password);
     localStorage.setItem('token', token);
     const u = await authApi.me();
     setUser(u);
     return u;
   };
 
-  const register = async (body) => {
-    const { token } = await authApi.register(body);
+  const registerStart = async (body) => authApi.registerStart(body);
+
+  const registerResend = async (email) => authApi.registerResend(email);
+
+  const registerVerify = async ({ email, code, phoneCode }) => {
+    const { token } = await authApi.registerVerify({ email, code, phoneCode });
     localStorage.setItem('token', token);
     const u = await authApi.me();
     setUser(u);
@@ -40,8 +44,18 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    const u = await authApi.me();
+    setUser(u);
+    return u;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, registerStart, registerResend, registerVerify, logout, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

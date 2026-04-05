@@ -7,8 +7,16 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
       registerType: 'autoUpdate',
-      devOptions: { enabled: true },
+      // type must match how the browser registers the worker (classic vs ESM). Ours is bundled as classic in dev.
+      devOptions: { enabled: true, type: 'classic' },
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,svg,woff2}'],
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+      },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'vite.svg'],
       manifest: {
         name: 'Mobile Mechanic',
@@ -42,22 +50,6 @@ export default defineConfig({
         ],
         categories: ['utilities', 'automotive']
       },
-      workbox: {
-        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
-        globPatterns: ['**/*.{js,css,html,ico,svg,woff2}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https?:\/\/.*\/api\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: { maxEntries: 50, maxAgeSeconds: 300 },
-              cacheableResponse: { statuses: [0, 200] },
-              networkTimeoutSeconds: 10
-            }
-          }
-        ]
-      }
     })
   ],
   server: {
@@ -65,5 +57,14 @@ export default defineConfig({
       '/api': 'http://localhost:3001',
       '/uploads': 'http://localhost:3001',
     },
+    // Host header must match; ngrok (and other tunnels) use random subdomains each session.
+    // Use hostname only — not https:// or trailing slashes.
+    allowedHosts: [
+      'localhost',
+      'untortuous-uncommutatively-clifford.ngrok-free.dev',
+      '.ngrok-free.dev',
+      '.ngrok-free.app',
+      '.ngrok.io',
+    ],
   },
 })

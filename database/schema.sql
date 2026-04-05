@@ -11,7 +11,7 @@ CREATE TYPE user_role AS ENUM ('user', 'mechanic', 'admin');
 CREATE TYPE service_type AS ENUM ('emergency', 'scheduled');
 
 -- Booking status enum
-CREATE TYPE booking_status AS ENUM ('pending', 'accepted', 'in_progress', 'completed', 'cancelled');
+CREATE TYPE booking_status AS ENUM ('pending', 'accepted', 'in_progress', 'completed', 'cancelled', 'rejected');
 
 -- Users table (covers both regular users and admins)
 CREATE TABLE users (
@@ -19,7 +19,8 @@ CREATE TABLE users (
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   full_name VARCHAR(255) NOT NULL,
-  phone VARCHAR(50) UNIQUE,
+  phone VARCHAR(50) UNIQUE NOT NULL,
+  profile_photo TEXT,
   role user_role NOT NULL DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -75,6 +76,7 @@ CREATE TABLE bookings (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   mechanic_id UUID REFERENCES mechanics(id) ON DELETE SET NULL,
+  rejected_by_mechanic_id UUID REFERENCES mechanics(id) ON DELETE SET NULL,
   category_id UUID NOT NULL REFERENCES service_categories(id) ON DELETE CASCADE,
   service_type service_type NOT NULL,
   user_latitude DECIMAL(10, 8) NOT NULL,

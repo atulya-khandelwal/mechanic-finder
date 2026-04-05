@@ -11,6 +11,10 @@ import usersRoutes from './routes/users.js';
 import adminRoutes from './routes/admin.js';
 import uploadRoutes from './routes/upload.js';
 import reviewsRoutes from './routes/reviews.js';
+import pushRoutes from './routes/push.js';
+import emailRoutes from './routes/email.routes.js';
+import aiRoutes from './routes/ai.js';
+import paymentRoutes from './routes/payments.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -27,6 +31,10 @@ app.use('/api/users', usersRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/reviews', reviewsRoutes);
+app.use('/api/push', pushRoutes);
+app.use('/api/email', emailRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

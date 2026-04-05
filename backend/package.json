@@ -8,7 +8,18 @@
     "start": "node index.js",
     "db:init": "node scripts/init-db.js",
     "db:seed": "node scripts/seed-db.js",
-    "db:migrate": "node scripts/migrate-booking-details.js"
+    "db:truncate-data": "node scripts/truncate-all-data.js",
+    "db:migrate": "node scripts/migrate-booking-details.js",
+    "db:migrate-push": "node scripts/run-migration-push.js",
+    "db:migrate-rejected": "node scripts/run-migration-rejected.js",
+    "db:verify-booking-enum": "node scripts/verify-booking-status-enum.js",
+    "db:migrate-rejected-by": "node scripts/run-migration-rejected-by.js",
+    "db:migrate-signup": "node scripts/run-migration-signup.js",
+    "db:migrate-phone-not-null": "node scripts/run-migration-phone-not-null.js",
+    "db:migrate-profile-photo": "node scripts/run-migration-profile-photo.js",
+    "db:migrate-razorpay": "node scripts/run-migration-razorpay.js",
+    "db:migrate-payment-method": "node scripts/run-migration-payment-method.js",
+    "generate-vapid": "node scripts/generate-vapid-keys.js"
   },
   "keywords": [],
   "author": "",
@@ -16,11 +27,17 @@
   "description": "Mobile Mechanic API",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
+    "express": "^4.22.1",
     "jsonwebtoken": "^9.0.2",
+    "libphonenumber-js": "^1.12.41",
     "multer": "^1.4.5-lts.1",
-    "pg": "^8.11.3"
+    "nodemailer": "^6.10.1",
+    "pg": "^8.11.3",
+    "razorpay": "^2.9.6",
+    "twilio": "^5.13.1",
+    "web-push": "^3.6.7"
   }
 }

@@ -1,56 +1,79 @@
-# Mobile Mechanic Application
+# Mobile Mechanic
 
-A web application that connects users with mobile mechanics. Users can find mechanics within 10km, request emergency or scheduled services, and mechanics can manage their profile and bookings.
+A web app that connects customers with mobile mechanics: location-based discovery, emergency and scheduled service requests, booking workflows for users and mechanics, optional online payments (Razorpay), and cash-on-delivery with mechanic confirmation.
 
 ## Features
 
-- **Location-based search**: Find mechanics within 10km of your location (GPS or manual entry)
-- **Two service types**:
-  - **Emergency**: Instant service (breakdown, flat tire, battery jump)
-  - **Scheduled**: Plan ahead (oil change, brake inspection, cleaning)
-- **Three dashboards**:
-  - **User**: Find mechanics, book services, view bookings
-  - **Mechanic**: Manage profile, accept/complete jobs
-  - **Admin**: Overview, users, mechanics, bookings
+- **Location**: Find mechanics within 10 km (browser geolocation or manual coordinates).
+- **Service types**: Emergency (e.g. breakdown, flat tire, battery) and scheduled (e.g. oil change, brakes, cleaning).
+- **Bookings**: Vehicle details, photos (local uploads or Cloudinary), chat per booking, status workflow (pending → accepted → in progress → completed).
+- **Auth**: Email + SMS OTP signup (`/register/start` → `/register/verify`), JWT login, roles: `user`, `mechanic`, `admin`.
+- **Payments (INR)**: Cash on delivery (default) or pay online with Razorpay from booking details; mechanics can confirm cash received after the job is completed.
+- **AI triage (optional)**: Groq-powered suggestion of service category and safety tips from a free-text problem description (requires `GROQ_API_KEY`).
+- **Notifications**: Web Push (VAPID) for booking events when configured.
+- **Email**: SMTP for OTP and transactional mail when `SMTP_*` is set.
+- **SMS**: Twilio Verify for phone codes in production; `PHONE_VERIFY_SKIP` for local dev only.
+- **PWA**: Vite PWA plugin; service worker for offline shell caching where enabled.
 
-## Tech Stack
+## Tech stack
 
-- **Backend**: Node.js, Express, PostgreSQL
-- **Frontend**: React, Vite
-- **Auth**: JWT
+| Layer       | Stack |
+|------------|--------|
+| API        | Node.js 20+, Express, ESM |
+| Database   | PostgreSQL |
+| Frontend   | React 19, React Router 7, Vite 7 |
+| Auth       | JWT (`Authorization: Bearer`) |
+| Payments   | Razorpay Orders + Checkout (server-side verify) |
 
-## Setup
+## Prerequisites
 
-### 1. Database (PostgreSQL)
+- Node.js 20+
+- PostgreSQL
+- Optional: Cloudinary, Twilio, Razorpay, Groq, SMTP — see `backend/.env.example`
 
-Create the database and run schema:
+## Quick start
+
+### 1. Database
+
+Create a database and apply the base schema (from repo root):
 
 ```bash
 createdb mobile_mechanic
-psql -d mobile_mechanic -f database/schema.sql
-```
-
-Or use the backend script:
-
-```bash
 cd backend
+cp .env.example .env
+# Edit .env with DATABASE_URL and JWT_SECRET
+npm install
 npm run db:init
 npm run db:seed
 ```
 
-### 2. Backend
+`db:seed` loads `database/seed.sql` and creates the admin user (see below).
+
+### 2. Migrations (optional features)
+
+Run these when you need the related columns and features (each reads `DATABASE_URL` from `backend/.env`):
+
+| Script | Purpose |
+|--------|---------|
+| `npm run db:migrate` | Booking pricing / vehicle details |
+| `npm run db:migrate-push` | Push notification subscriptions |
+| `npm run db:migrate-razorpay` | `payment_status`, Razorpay IDs |
+| `npm run db:migrate-payment-method` | `payment_method` (`cod` / `online`) |
+
+Other scripts under `npm run` (e.g. signup, profile photo) exist for older or incremental DB changes; see `backend/package.json` if your database was created from an older snapshot.
+
+### 3. Backend
 
 ```bash
 cd backend
-cp .env.example .env
-# Edit .env with your PostgreSQL credentials
-npm install
 npm run dev
 ```
 
-Backend runs on http://localhost:3001
+API: **http://localhost:3001** — health check: `GET /api/health`.
 
-### 3. Frontend
+Use `npm start` if `node --watch` hits file-watcher limits on your machine.
+
+### 4. Frontend
 
 ```bash
 cd frontend
@@ -58,30 +81,65 @@ npm install
 npm run dev
 ```
 
-Frontend runs on http://localhost:5173 (proxies API to backend)
+Dev server defaults to **http://localhost:5173** (Vite). In `vite.config.js`, `/api` and `/uploads` are **proxied to port 3001**. The backend must be running or the browser will see proxy errors (`ECONNREFUSED`).
 
-### 4. Create Admin User
+If you use ngrok or another tunnel, point it at the Vite port you actually use (e.g. 5173 or 5174) and add the host to `allowedHosts` in `vite.config.js` if required.
 
-After running `npm run db:seed`, admin credentials:
-- Email: `admin@mobilemechanic.com`
-- Password: `admin123`
+## Default admin (after seed)
 
-## Environment Variables (Backend)
+From `backend/scripts/seed-db.js`:
 
-| Variable | Description |
-|----------|-------------|
-| PORT | Server port (default: 3001) |
-| DATABASE_URL | PostgreSQL connection string |
-| JWT_SECRET | Secret for JWT signing |
+- **Email:** `admin@mobilemechanic.com`
+- **Password:** `admin123`
 
-## API Endpoints
+Change this in production.
 
-- `POST /api/auth/register` - Register (user or mechanic)
-- `POST /api/auth/login` - Login
-- `GET /api/auth/me` - Current user
-- `GET /api/mechanics/nearby?lat=&lng=` - Mechanics within 10km
-- `GET /api/services/categories` - Service categories
-- `POST /api/bookings` - Create booking
-- `GET /api/bookings/my` - My bookings
-- `PATCH /api/bookings/:id/status` - Update status
-- `GET /api/admin/*` - Admin endpoints (admin role required)
+## Environment variables (backend)
+
+Copy `backend/.env.example` to `backend/.env` and fill in what you need. Important groups:
+
+| Area | Variables |
+|------|-----------|
+| Core | `PORT`, `DATABASE_URL`, `JWT_SECRET` |
+| Email OTP | `SMTP_*`, `OTP_*` |
+| Phone SMS | `TWILIO_*`, `DEFAULT_PHONE_REGION`, `PHONE_VERIFY_SKIP` (dev only) |
+| Push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` |
+| Images | `CLOUDINARY_*` or local `backend/uploads` |
+| AI triage | `GROQ_API_KEY`, `GROQ_MODEL` |
+| Payments | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` |
+
+Never commit real secrets. Use test keys for Razorpay and Twilio in development.
+
+## API overview
+
+Routes are mounted under `/api` (prefix shown below).
+
+| Prefix | Role |
+|--------|------|
+| `GET /health` | Liveness |
+| `/auth/*` | Login, register (start / verify / resend), `me`, profile, password |
+| `/mechanics/*` | Nearby mechanics, mechanic profile |
+| `/services/categories` | Service categories |
+| `/bookings/*` | Create booking, list mine, single booking, status, assign, claim, reject, messages, `POST .../confirm-cash-payment` (mechanic, COD) |
+| `/users/*` | Saved locations |
+| `/upload/*` | Authenticated image uploads |
+| `/reviews/*` | Reviews after completed jobs |
+| `/push/*` | VAPID key, subscribe / unsubscribe |
+| `/email/*` | Email-related helpers (if used) |
+| `/admin/*` | Admin-only (users, mechanics, bookings, stats) |
+| `/ai/*` | `GET /capabilities`, `POST /triage` (Groq, user role) |
+| `/payments/*` | `GET /config`, Razorpay create-order / verify |
+
+Refer to `backend/routes/*.js` and `backend/index.js` for the exact paths and methods.
+
+## Project layout
+
+```
+backend/          Express app, services, middleware
+database/         schema.sql, seeds, SQL migrations
+frontend/         Vite + React app (pages, components, api client)
+```
+
+## License
+
+ISC (see `backend/package.json`).

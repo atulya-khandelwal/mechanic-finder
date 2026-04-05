@@ -15,7 +15,8 @@ function PrivateRoute({ children, allowedRoles }) {
   if (loading) return <div className="loading">Loading...</div>;
   if (!user) return <Navigate to="/login" replace />;
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    const redirect = user.role === 'admin' ? '/admin' : user.role === 'mechanic' ? '/mechanic' : '/user';
+    const redirect =
+      user.role === 'admin' ? '/admin' : user.role === 'mechanic' ? '/mechanic/overview' : '/user/find';
     return <Navigate to={redirect} replace />;
   }
   return children;
@@ -35,7 +36,7 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/mechanic"
+        path="/mechanic/jobs/:bookingId"
         element={
           <PrivateRoute allowedRoles={['mechanic']}>
             <MechanicDashboard />
@@ -43,7 +44,16 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/user"
+        path="/mechanic/:tab"
+        element={
+          <PrivateRoute allowedRoles={['mechanic']}>
+            <MechanicDashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route path="/mechanic" element={<Navigate to="/mechanic/overview" replace />} />
+      <Route
+        path="/user/bookings/:bookingId"
         element={
           <PrivateRoute allowedRoles={['user']}>
             <LocationGate>
@@ -52,6 +62,17 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/user/:tab"
+        element={
+          <PrivateRoute allowedRoles={['user']}>
+            <LocationGate>
+              <UserDashboard />
+            </LocationGate>
+          </PrivateRoute>
+        }
+      />
+      <Route path="/user" element={<Navigate to="/user/find" replace />} />
       <Route path="/" element={<NavigateToRole />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -63,8 +84,8 @@ function NavigateToRole() {
   if (loading) return <div className="loading">Loading...</div>;
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === 'admin') return <Navigate to="/admin" replace />;
-  if (user.role === 'mechanic') return <Navigate to="/mechanic" replace />;
-  return <Navigate to="/user" replace />;
+  if (user.role === 'mechanic') return <Navigate to="/mechanic/overview" replace />;
+  return <Navigate to="/user/find" replace />;
 }
 
 export default function App() {

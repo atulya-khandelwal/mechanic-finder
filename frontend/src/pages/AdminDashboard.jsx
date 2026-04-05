@@ -34,7 +34,7 @@ export default function AdminDashboard() {
       await admin.createUser({
         fullName: form.fullName.value,
         email: form.email.value,
-        phone: form.phone.value || null,
+        phone: form.phone.value.trim(),
         password: form.password.value,
       });
       form.reset();
@@ -54,7 +54,7 @@ export default function AdminDashboard() {
       await admin.createMechanic({
         fullName: form.fullName.value,
         email: form.email.value,
-        phone: form.phone.value || null,
+        phone: form.phone.value.trim(),
         password: form.password.value,
         address: form.address.value || null,
         specialization: form.specialization.value || null,
@@ -120,7 +120,7 @@ export default function AdminDashboard() {
               <h4>Add New User</h4>
               <input name="fullName" placeholder="Full Name" required />
               <input name="email" type="email" placeholder="Email" required />
-              <input name="phone" placeholder="Phone" />
+              <input name="phone" type="tel" inputMode="tel" placeholder="Phone (unique, e.g. +91…)" required />
               <input name="password" type="password" placeholder="Password" required minLength={6} />
               {addError && <p className="error">{addError}</p>}
               <div>
@@ -165,7 +165,7 @@ export default function AdminDashboard() {
               <h4>Add New Mechanic</h4>
               <input name="fullName" placeholder="Full Name" required />
               <input name="email" type="email" placeholder="Email" required />
-              <input name="phone" placeholder="Phone" />
+              <input name="phone" type="tel" inputMode="tel" placeholder="Phone (unique, e.g. +91…)" required />
               <input name="password" type="password" placeholder="Password" required minLength={6} />
               <input name="address" placeholder="Address" />
               <input name="specialization" placeholder="Specialization (e.g. General, Brakes)" />
