@@ -7,7 +7,7 @@ A web app that connects customers with mobile mechanics: location-based discover
 - **Location**: Find mechanics within 10 km (browser geolocation or manual coordinates).
 - **Service types**: Emergency (e.g. breakdown, flat tire, battery) and scheduled (e.g. oil change, brakes, cleaning).
 - **Bookings**: Vehicle details, photos (Cloudinary), chat per booking, status workflow (pending → accepted → in progress → completed).
-- **Auth**: Email + SMS OTP signup (`/register/start` → `/register/verify`), JWT login, roles: `user`, `mechanic`, `admin`.
+- **Auth**: Email + SMS OTP signup (`/register/start` → `/register/verify`), JWT login, forgot password via **email magic link** (`/forgot-password` → `/reset-password`), roles: `user`, `mechanic`, `admin`.
 - **Payments (INR)**: Cash on delivery (default) or pay online with Razorpay from booking details; mechanics can confirm cash received after the job is completed.
 - **AI triage (optional)**: Groq-powered suggestion of service category and safety tips from a free-text problem description (requires `GROQ_API_KEY`).
 - **Notifications**: Web Push (VAPID) for booking events when configured.
@@ -59,6 +59,7 @@ Run these when you need the related columns and features (each reads `DATABASE_U
 | `npm run db:migrate-push` | Push notification subscriptions |
 | `npm run db:migrate-razorpay` | `payment_status`, Razorpay IDs |
 | `npm run db:migrate-payment-method` | `payment_method` (`cod` / `online`) |
+| `npm run db:migrate-password-reset` | `password_reset_tokens` (forgot-password magic links) |
 
 Other scripts under `npm run` (e.g. signup, profile photo) exist for older or incremental DB changes; see `backend/package.json` if your database was created from an older snapshot.
 
@@ -105,6 +106,7 @@ Copy `backend/.env.example` to `backend/.env` and fill in what you need. Importa
 | Area | Variables |
 |------|-----------|
 | Core | `PORT`, `DATABASE_URL`, `JWT_SECRET` |
+| Magic-link reset | `PUBLIC_APP_URL` (SPA origin for links, e.g. `https://your-app.vercel.app`), optional `PASSWORD_RESET_TTL_MINUTES` (default 60) |
 | Email OTP | `RESEND_API_KEY`, `SMTP_FROM` (sender), `OTP_*` |
 | Phone SMS | `TWILIO_*`, `DEFAULT_PHONE_REGION`, `PHONE_VERIFY_SKIP` (dev only) |
 | Push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` |
@@ -134,7 +136,7 @@ Routes are mounted under `/api` (prefix shown below).
 | Prefix | Role |
 |--------|------|
 | `GET /health` | Liveness |
-| `/auth/*` | Login, register (start / verify / resend), `me`, profile, password |
+| `/auth/*` | Login, register (start / verify / resend), `forgot-password`, `reset-password`, `me`, profile, password |
 | `/mechanics/*` | Nearby mechanics, mechanic profile |
 | `/services/categories` | Service categories |
 | `/bookings/*` | Create booking, list mine, single booking, status, assign, claim, reject, messages, `POST .../confirm-cash-payment` (mechanic, COD) |

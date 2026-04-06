@@ -53,6 +53,39 @@ export async function sendSignupOtpEmail({ to, code, fullName }) {
 }
 
 /**
+ * Password reset magic link (single-use; link expires per PASSWORD_RESET_TTL_MINUTES).
+ */
+export async function sendPasswordResetEmail({ to, resetUrl }) {
+  const safeUrl = escapeHtml(resetUrl);
+  const minutes = config.passwordResetTtlMinutes;
+  const subject = 'Reset your Mobile Mechanic password';
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f4f4f5;color:#18181b;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" style="max-width:480px;background:#fff;border-radius:12px;padding:32px 28px;border:1px solid #e4e4e7;">
+        <tr><td style="font-size:15px;line-height:1.6;color:#3f3f46;">
+          <p style="margin:0 0 16px;">Hi,</p>
+          <p style="margin:0 0 20px;">We received a request to reset your Mobile Mechanic password. Click the button below to choose a new password. This link expires in ${minutes} minutes.</p>
+          <p style="margin:0 0 24px;text-align:center;">
+            <a href="${safeUrl}" style="display:inline-block;background:#0ea5e9;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Reset password</a>
+          </p>
+          <p style="margin:0 0 12px;font-size:13px;color:#71717a;word-break:break-all;">If the button does not work, copy and paste this link into your browser:<br/><a href="${safeUrl}" style="color:#0ea5e9;">${safeUrl}</a></p>
+          <p style="margin:0;font-size:13px;color:#71717a;">If you did not request a password reset, you can ignore this email.</p>
+        </td></tr>
+      </table>
+      <p style="margin:20px 0 0;font-size:12px;color:#a1a1aa;">Mobile Mechanic</p>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+  return sendEmail({ to, subject, html });
+}
+
+/**
  * Invoice-style summary emailed to the customer when a booking is marked completed.
  * No-ops when Resend is not configured or `to` is missing (logs a warning).
  */

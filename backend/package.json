@@ -19,6 +19,7 @@
     "db:migrate-profile-photo": "node scripts/run-migration-profile-photo.js",
     "db:migrate-razorpay": "node scripts/run-migration-razorpay.js",
     "db:migrate-payment-method": "node scripts/run-migration-payment-method.js",
+    "db:migrate-password-reset": "node scripts/run-migration-password-reset.js",
     "generate-vapid": "node scripts/generate-vapid-keys.js"
   },
   "keywords": [],

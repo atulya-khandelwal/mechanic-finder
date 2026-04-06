@@ -111,6 +111,15 @@ CREATE TABLE reviews (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Password reset (magic link; token stored as SHA-256 hex)
+CREATE TABLE password_reset_tokens (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for performance
 CREATE INDEX idx_mechanics_location ON mechanics(latitude, longitude);
 CREATE INDEX idx_mechanics_available ON mechanics(is_available) WHERE is_available = true;
@@ -119,6 +128,7 @@ CREATE INDEX idx_bookings_mechanic ON bookings(mechanic_id);
 CREATE INDEX idx_bookings_status ON bookings(status);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
+CREATE INDEX idx_password_reset_user ON password_reset_tokens(user_id);
 
 -- Function to calculate distance (Haversine formula in km)
 CREATE OR REPLACE FUNCTION distance_km(

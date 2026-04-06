@@ -16,6 +16,10 @@ import {
   usersSelectColumnsForAuth,
   usersSelectColumnsForMe,
 } from '../services/users-schema.util.js';
+import {
+  requestPasswordReset,
+  completePasswordReset,
+} from '../services/password-reset.service.js';
 
 const router = express.Router();
 
@@ -112,6 +116,37 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+/** Request password reset — sends magic link to email (same response whether or not user exists) */
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const out = await requestPasswordReset(email);
+    res.status(200).json(out);
+  } catch (err) {
+    const status = err.status || 500;
+    if (status >= 500) console.error(err);
+    res.status(status).json({ error: err.message || 'Failed to send reset email' });
+  }
+});
+
+/** Complete password reset from magic link token; returns JWT like login */
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    const user = await completePasswordReset({ token, newPassword });
+    const jwtToken = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      config.jwtSecret,
+      { expiresIn: config.jwtExpiresIn }
+    );
+    res.json({ user, token: jwtToken, message: 'Password updated' });
+  } catch (err) {
+    const status = err.status || 500;
+    if (status >= 500) console.error(err);
+    res.status(status).json({ error: err.message || 'Password reset failed' });
   }
 });
 

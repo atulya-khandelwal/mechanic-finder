@@ -37,4 +37,13 @@ export const config = {
   /** Razorpay (INR) — Key ID is public; Key Secret stays on the server only */
   razorpayKeyId: (process.env.RAZORPAY_KEY_ID || '').trim(),
   razorpayKeySecret: (process.env.RAZORPAY_KEY_SECRET || '').trim(),
+  /**
+   * Public SPA origin for magic links (no trailing slash). Example: https://app.example.com
+   * Dev default matches Vite on port 5173.
+   */
+  publicAppUrl: (process.env.PUBLIC_APP_URL || process.env.FRONTEND_URL || 'http://localhost:5173').replace(
+    /\/$/,
+    ''
+  ),
+  passwordResetTtlMinutes: parseInt(process.env.PASSWORD_RESET_TTL_MINUTES || '60', 10),
 };

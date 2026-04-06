@@ -52,9 +52,27 @@ export function AuthProvider({ children }) {
     return u;
   };
 
+  /** Store JWT and load profile (e.g. after password reset). */
+  const applyAuthToken = async (token) => {
+    localStorage.setItem('token', token);
+    const u = await authApi.me();
+    setUser(u);
+    return u;
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, registerStart, registerResend, registerVerify, logout, refreshUser }}
+      value={{
+        user,
+        loading,
+        login,
+        registerStart,
+        registerResend,
+        registerVerify,
+        logout,
+        refreshUser,
+        applyAuthToken,
+      }}
     >
       {children}
     </AuthContext.Provider>

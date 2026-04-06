@@ -75,6 +75,9 @@ export default function Login() {
           {error && <p className="error">{error}</p>}
           <button type="submit" className="btn btn-primary">Sign In</button>
         </form>
+        <p className="auth-link">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
         <p className="auth-link">Don't have an account? <Link to="/register">Register as User or Mechanic</Link></p>
       </div>
     </div>

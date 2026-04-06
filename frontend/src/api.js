@@ -34,6 +34,10 @@ export const auth = {
   me: () => fetchAPI('/auth/me'),
   updateProfile: (body) => fetchAPI('/auth/profile', { method: 'PATCH', body: JSON.stringify(body) }),
   changePassword: (body) => fetchAPI('/auth/password', { method: 'PATCH', body: JSON.stringify(body) }),
+  forgotPassword: (email) =>
+    fetchAPI('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (body) =>
+    fetchAPI('/auth/reset-password', { method: 'POST', body: JSON.stringify(body) }),
 };
 
 export const mechanics = {
