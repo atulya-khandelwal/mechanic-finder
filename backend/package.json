@@ -8,6 +8,7 @@
     "start": "node index.js",
     "db:init": "node scripts/init-db.js",
     "db:seed": "node scripts/seed-db.js",
+    "db:seed-test-users-mechanics": "node scripts/seed-test-users-mechanics.js",
     "db:truncate-data": "node scripts/truncate-all-data.js",
     "db:migrate": "node scripts/migrate-booking-details.js",
     "db:migrate-push": "node scripts/run-migration-push.js",

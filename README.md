@@ -49,6 +49,8 @@ npm run db:seed
 
 `db:seed` loads `database/seed.sql` and creates the admin user (see below).
 
+**Test accounts (optional, QA):** `npm run db:seed-test-users-mechanics` inserts sample customers and mechanics near SKIT College, Jagatpura, Jaipur with fixed emails and passwords — see `backend/scripts/seed-test-users-mechanics.js`. By default it seeds **user6–user10** and **mechanic6–mechanic10** (so user1–user5 can stay in use) and only deletes those specific emails before re-inserting. Adjust `USER_START_INDEX` / `MECHANIC_START_INDEX` in the script if needed.
+
 ### 2. Migrations (optional features)
 
 Run these when you need the related columns and features (each reads `DATABASE_URL` from `backend/.env`):
