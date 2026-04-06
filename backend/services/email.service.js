@@ -1,32 +1,26 @@
-import { getSmtpTransporter } from '../providers/smtp.provider.js';
+import { getResendClient } from '../providers/resend-email.provider.js';
 import { config } from '../config.js';
 
-export async function sendEmail({ to, subject, html }) {
-  if (!config.smtp.host) {
-    throw new Error('Email is not configured (set SMTP_HOST and related SMTP_* variables)');
+export async function sendEmail({ to, subject, html, idempotencyKey }) {
+  const resend = getResendClient();
+  if (!resend) {
+    throw new Error(
+      'Email is not configured. Set RESEND_API_KEY and SMTP_FROM (verified sender domain in Resend).'
+    );
   }
-  const transport = getSmtpTransporter();
-  if (!transport) {
-    throw new Error('SMTP transport is not available');
+  const payload = {
+    from: config.smtpFrom,
+    to: Array.isArray(to) ? to : [to],
+    subject,
+    html,
+  };
+  const opts = idempotencyKey ? { idempotencyKey } : undefined;
+  const { data, error } = await resend.emails.send(payload, opts);
+  if (error) {
+    console.error('[Resend] emails.send failed', error);
+    throw new Error(error.message || 'Resend send failed');
   }
-  try {
-    const info = await transport.sendMail({
-      from: config.smtpFrom,
-      to,
-      subject,
-      html,
-    });
-    return info;
-  } catch (err) {
-    console.error('[SMTP] sendMail failed', {
-      host: config.smtp.host,
-      port: config.smtp.port,
-      secure: config.smtp.secure,
-      code: err.code,
-      message: err.message,
-    });
-    throw err;
-  }
+  return data;
 }
 
 /**
@@ -60,7 +54,7 @@ export async function sendSignupOtpEmail({ to, code, fullName }) {
 
 /**
  * Invoice-style summary emailed to the customer when a booking is marked completed.
- * No-ops when SMTP is not configured or `to` is missing (logs a warning).
+ * No-ops when Resend is not configured or `to` is missing (logs a warning).
  */
 export async function sendBookingInvoiceEmail({
   to,
@@ -78,8 +72,8 @@ export async function sendBookingInvoiceEmail({
     console.warn('Invoice email skipped: no recipient email');
     return;
   }
-  if (!config.smtp.host) {
-    console.warn('Invoice email skipped: SMTP not configured');
+  if (!config.resendApiKey) {
+    console.warn('Invoice email skipped: set RESEND_API_KEY');
     return;
   }
 
@@ -129,7 +123,8 @@ export async function sendBookingInvoiceEmail({
 </body>
 </html>`;
 
-  return sendEmail({ to: String(to).trim(), subject, html });
+  const idempotencyKey = `invoice/${bookingId}`;
+  return sendEmail({ to: String(to).trim(), subject, html, idempotencyKey });
 }
 
 function escapeHtml(s) {

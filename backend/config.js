@@ -8,18 +8,13 @@ export const config = {
   jwtExpiresIn: '7d',
   vapidPublicKey: process.env.VAPID_PUBLIC_KEY || '',
   vapidPrivateKey: process.env.VAPID_PRIVATE_KEY || '',
-  /** Outgoing mail identity (From header) */
+  /** Resend HTTPS API — https://resend.com/api-keys */
+  resendApiKey: (process.env.RESEND_API_KEY || '').trim(),
+  /** Outgoing mail identity (From); must use a domain verified in Resend */
   smtpFrom:
     process.env.SMTP_FROM ||
     process.env.EMAIL_FROM ||
     'Mobile Mechanic <noreply@localhost>',
-  smtp: {
-    host: process.env.SMTP_HOST || '',
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_SECURE === '1',
-    user: process.env.SMTP_USER ?? '',
-    pass: process.env.SMTP_PASS ?? '',
-  },
   otpTtlMinutes: parseInt(process.env.OTP_TTL_MINUTES || '10', 10),
   otpLength: parseInt(process.env.OTP_LENGTH || '6', 10),
   otpMaxAttempts: parseInt(process.env.OTP_MAX_ATTEMPTS || '5', 10),

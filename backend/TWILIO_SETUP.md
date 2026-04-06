@@ -2,7 +2,7 @@
 
 Registration requires a **phone number** for both **customers** and **mechanics**. After you submit the form, the API:
 
-1. Sends an **email** with a one-time code (existing SMTP / Resend setup).
+1. Sends an **email** with a one-time code (Resend API when `RESEND_API_KEY` is set).
 2. Sends an **SMS** via **Twilio Verify** with a separate code.
 
 You must enter **both** codes on step 2 of `/register`.
@@ -73,13 +73,13 @@ NODE_ENV=development
 
 With skip mode, the server does **not** send SMS, and any **4–8 digit** SMS code is accepted for the phone step. **Do not set this in production.**
 
-You still need **email** OTP (configure SMTP or rely on console log when `SMTP_HOST` is empty in development).
+You still need **email** OTP (set `RESEND_API_KEY` and `SMTP_FROM`, or rely on console log when `RESEND_API_KEY` is unset in non-production).
 
 ## 8. Production checklist
 
 - [ ] `TWILIO_*` set; `PHONE_VERIFY_SKIP` **unset** or `false`.
 - [ ] `NODE_ENV=production`.
-- [ ] SMTP configured for email OTP.
+- [ ] `RESEND_API_KEY` and `SMTP_FROM` configured for email OTP.
 - [ ] Twilio account **upgraded** (or all user numbers pre-verified—only realistic for testing).
 - [ ] Users enter phone in **E.164** or valid local format; the API normalizes using `DEFAULT_PHONE_REGION`.
 

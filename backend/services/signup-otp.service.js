@@ -106,10 +106,10 @@ export async function requestSignupOtp({ email, password, fullName, phone, role 
     [normalized, passwordHash, fullName.trim(), normalizedPhone, safeRole, otpHash, expiresAt]
   );
 
-  const devLogOtp = process.env.NODE_ENV !== 'production' && !config.smtp.host;
+  const devLogOtp = process.env.NODE_ENV !== 'production' && !config.resendApiKey;
   try {
     if (devLogOtp) {
-      console.info(`[signup] Email OTP for ${normalized} (dev only, no SMTP_HOST): ${otp}`);
+      console.info(`[signup] Email OTP for ${normalized} (dev only, no RESEND_API_KEY): ${otp}`);
     } else {
       await sendSignupOtpEmail({ to: normalized, code: otp, fullName: fullName.trim() });
     }
@@ -169,10 +169,10 @@ export async function resendSignupOtp(email) {
     [normalized, otpHash, expiresAt]
   );
 
-  const devLogOtp = process.env.NODE_ENV !== 'production' && !config.smtp.host;
+  const devLogOtp = process.env.NODE_ENV !== 'production' && !config.resendApiKey;
   try {
     if (devLogOtp) {
-      console.info(`[signup] Email OTP resent for ${normalized} (dev only, no SMTP_HOST): ${otp}`);
+      console.info(`[signup] Email OTP resent for ${normalized} (dev only, no RESEND_API_KEY): ${otp}`);
     } else {
       await sendSignupOtpEmail({ to: normalized, code: otp, fullName: row.rows[0].full_name });
     }

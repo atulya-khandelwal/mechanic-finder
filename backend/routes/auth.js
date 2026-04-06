@@ -19,7 +19,7 @@ import {
 
 const router = express.Router();
 
-/** Step 1: store pending signup + send OTP via SMTP */
+/** Step 1: store pending signup + send OTP via email (Resend) */
 router.post('/register/start', async (req, res) => {
   try {
     const { email, password, fullName, phone, role = 'user' } = req.body;

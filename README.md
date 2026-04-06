@@ -11,7 +11,7 @@ A web app that connects customers with mobile mechanics: location-based discover
 - **Payments (INR)**: Cash on delivery (default) or pay online with Razorpay from booking details; mechanics can confirm cash received after the job is completed.
 - **AI triage (optional)**: Groq-powered suggestion of service category and safety tips from a free-text problem description (requires `GROQ_API_KEY`).
 - **Notifications**: Web Push (VAPID) for booking events when configured.
-- **Email**: SMTP for OTP and transactional mail when `SMTP_*` is set.
+- **Email**: [Resend](https://resend.com/) HTTP API for OTP and transactional mail when `RESEND_API_KEY` and `SMTP_FROM` (verified domain) are set.
 - **SMS**: Twilio Verify for phone codes in production; `PHONE_VERIFY_SKIP` for local dev only.
 - **PWA**: Vite PWA plugin; service worker for offline shell caching where enabled.
 
@@ -29,7 +29,7 @@ A web app that connects customers with mobile mechanics: location-based discover
 
 - Node.js 20+
 - PostgreSQL
-- Cloudinary (required for image uploads); optional: Twilio, Razorpay, Groq, SMTP — see `backend/.env.example`
+- Cloudinary (required for image uploads); optional: Twilio, Razorpay, Groq, Resend — see `backend/.env.example`
 
 ## Quick start
 
@@ -105,7 +105,7 @@ Copy `backend/.env.example` to `backend/.env` and fill in what you need. Importa
 | Area | Variables |
 |------|-----------|
 | Core | `PORT`, `DATABASE_URL`, `JWT_SECRET` |
-| Email OTP | `SMTP_*`, `OTP_*` |
+| Email OTP | `RESEND_API_KEY`, `SMTP_FROM` (sender), `OTP_*` |
 | Phone SMS | `TWILIO_*`, `DEFAULT_PHONE_REGION`, `PHONE_VERIFY_SKIP` (dev only) |
 | Push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` |
 | Images | `CLOUDINARY_URL` (or `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`) — required for uploads |
