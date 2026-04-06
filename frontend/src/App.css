@@ -879,6 +879,56 @@ textarea {
   margin: 1rem 0;
 }
 
+/* Cap height when many mechanics so the page stays usable */
+.mechanics-list--scroll {
+  max-height: min(55vh, 520px);
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  margin: 0.75rem 0 0.5rem;
+  scrollbar-gutter: stable;
+}
+
+.mechanics-filter-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+}
+
+.mechanics-filter-label-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.mechanics-filter-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.mechanics-filter-input::placeholder {
+  color: var(--text-muted);
+}
+
+.mechanics-list-summary {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.mechanics-show-more {
+  width: 100%;
+  margin: 0 0 0.75rem;
+}
+
 .mechanic-card {
   padding: 1rem;
   border-radius: 12px;
@@ -902,6 +952,21 @@ textarea {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin-top: 0.25rem;
+}
+
+.mechanic-phone {
+  font-size: 0.88rem !important;
+  color: var(--text-primary) !important;
+}
+
+.mechanic-phone-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mechanic-phone-link:hover {
+  text-decoration: underline;
 }
 
 .mechanic-location-block {

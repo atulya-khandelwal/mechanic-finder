@@ -25,11 +25,19 @@ const HOME_SERVICE_FEE = 15;
 const CURRENCY = '₹';
 const VALID_USER_TABS = ['find', 'bookings', 'profile'];
 
+/** Nearby mechanic cards: first batch + “Show more” to avoid huge lists (e.g. 100+) */
+const MECHANICS_INITIAL_VISIBLE = 12;
+const MECHANICS_INCREMENT = 12;
+
 export default function UserDashboard() {
   const mapsDeviceHint = getMapsDeviceHint();
   const { location, clearLocation } = useLoc();
   const { user, refreshUser, logout } = useAuth();
   const [mechanicsList, setMechanicsList] = useState([]);
+  /** True while fetching /mechanics/nearby for the current location */
+  const [mechanicsNearbyLoading, setMechanicsNearbyLoading] = useState(false);
+  const [mechanicsFilter, setMechanicsFilter] = useState('');
+  const [mechanicsVisibleCount, setMechanicsVisibleCount] = useState(MECHANICS_INITIAL_VISIBLE);
   const [categories, setCategories] = useState([]);
   const [myBookings, setMyBookings] = useState([]);
   const { tab: tabParam, bookingId } = useParams();
@@ -77,10 +85,59 @@ export default function UserDashboard() {
   };
 
   useEffect(() => {
-    if (location) {
-      mechanics.nearby(location.latitude, location.longitude).then(setMechanicsList).catch(() => setMechanicsList([]));
+    if (!location) {
+      setMechanicsList([]);
+      setMechanicsNearbyLoading(false);
+      return;
     }
+    setMechanicsNearbyLoading(true);
+    mechanics
+      .nearby(location.latitude, location.longitude)
+      .then(setMechanicsList)
+      .catch(() => setMechanicsList([]))
+      .finally(() => setMechanicsNearbyLoading(false));
   }, [location]);
+
+  useEffect(() => {
+    if (mechanicsNearbyLoading) return;
+    if (mechanicsList.length === 0) setSelectedMechanic(null);
+  }, [mechanicsList.length, mechanicsNearbyLoading]);
+
+  useEffect(() => {
+    setMechanicsFilter('');
+    setMechanicsVisibleCount(MECHANICS_INITIAL_VISIBLE);
+  }, [selectedService?.id]);
+
+  useEffect(() => {
+    setMechanicsVisibleCount(MECHANICS_INITIAL_VISIBLE);
+  }, [mechanicsList, mechanicsFilter]);
+
+  const filteredMechanics = useMemo(() => {
+    const q = mechanicsFilter.trim().toLowerCase();
+    if (!q) return mechanicsList;
+    return mechanicsList.filter(
+      (m) =>
+        (m.full_name && m.full_name.toLowerCase().includes(q)) ||
+        String(m.specialization || '')
+          .toLowerCase()
+          .includes(q) ||
+        String(m.address || '')
+          .toLowerCase()
+          .includes(q)
+    );
+  }, [mechanicsList, mechanicsFilter]);
+
+  const visibleMechanics = useMemo(
+    () => filteredMechanics.slice(0, mechanicsVisibleCount),
+    [filteredMechanics, mechanicsVisibleCount]
+  );
+
+  useEffect(() => {
+    setSelectedMechanic((prev) => {
+      if (!prev) return prev;
+      return filteredMechanics.some((m) => m.id === prev.id) ? prev : null;
+    });
+  }, [filteredMechanics]);
 
   useEffect(() => {
     services.categories().then(setCategories);
@@ -97,10 +154,7 @@ export default function UserDashboard() {
     }
   }, [tabParam, bookingId, navigate]);
 
-  useEffect(() => {
-    bookings.my().then(setMyBookings).catch(() => setMyBookings([]));
-  }, []);
-
+  /** Refreshes `/bookings/my` on an interval (see hook) — no separate mount fetch to avoid duplicate calls */
   useMyBookingsPolling(setMyBookings);
 
   useEffect(() => {
@@ -171,6 +225,10 @@ export default function UserDashboard() {
     if (!selectedService || !location) return;
     if (!vehicleNumber.trim() || !problemDescription.trim()) {
       alert('Please fill vehicle number and problem description');
+      return;
+    }
+    if (!mechanicsNearbyLoading && mechanicsList.length === 0) {
+      alert('No mechanics are available in your area right now. Try again later.');
       return;
     }
     setLoading(true);
@@ -663,12 +721,41 @@ export default function UserDashboard() {
               <button className="back" onClick={() => setSelectedService(null)}>← Back</button>
               <h3>Book: {selectedService.name}</h3>
 
-              <h4>Nearby Mechanics ({mechanicsList.length}) <span style={{ fontWeight: 'normal', color: '#94a3b8', fontSize: '0.9rem' }}>— Select one or leave unselected for mechanics to claim</span></h4>
-              <div className="mechanics-list">
-                {mechanicsList.length === 0 ? (
+              <h4>
+                Nearby mechanics ({mechanicsNearbyLoading ? '…' : mechanicsList.length}){' '}
+                <span style={{ fontWeight: 'normal', color: '#94a3b8', fontSize: '0.9rem' }}>
+                  — Select one or leave unselected for mechanics to claim
+                </span>
+              </h4>
+              {!mechanicsNearbyLoading && mechanicsList.length > 1 && (
+                <label className="mechanics-filter-label">
+                  <span className="mechanics-filter-label-text">Search</span>
+                  <input
+                    type="search"
+                    className="mechanics-filter-input"
+                    placeholder="Name, specialty, or area…"
+                    value={mechanicsFilter}
+                    onChange={(e) => setMechanicsFilter(e.target.value)}
+                    aria-label="Filter mechanics by name, specialty, or address"
+                  />
+                </label>
+              )}
+              {!mechanicsNearbyLoading && mechanicsList.length > 0 && (
+                <p className="mechanics-list-summary">
+                  {mechanicsFilter.trim()
+                    ? `Showing ${visibleMechanics.length} of ${filteredMechanics.length} matching · ${mechanicsList.length} nearby total`
+                    : `Showing ${visibleMechanics.length} of ${filteredMechanics.length} (closest first)`}
+                </p>
+              )}
+              <div className="mechanics-list mechanics-list--scroll">
+                {mechanicsNearbyLoading ? (
+                  <p>Loading nearby mechanics…</p>
+                ) : mechanicsList.length === 0 ? (
                   <p>No mechanics found within 10km</p>
+                ) : filteredMechanics.length === 0 ? (
+                  <p>No mechanics match your search. Clear the search box to see everyone nearby.</p>
                 ) : (
-                  mechanicsList.map((m) => {
+                  visibleMechanics.map((m) => {
                     return (
                     <div
                       key={m.id}
@@ -677,6 +764,18 @@ export default function UserDashboard() {
                     >
                       <strong>{m.full_name}</strong>
                       <span>{m.specialization || 'General'}</span>
+                      {m.phone && (
+                        <span className="mechanic-phone">
+                          Phone:{' '}
+                          <a
+                            href={`tel:${String(m.phone).replace(/\s/g, '')}`}
+                            className="mechanic-phone-link"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {e164ToIndianDisplay(m.phone) || m.phone}
+                          </a>
+                        </span>
+                      )}
                       <span>⭐ {Number(m.rating || 0).toFixed(1)} ({m.total_reviews || 0} reviews)</span>
                       <span>{m.distance_km != null ? Number(m.distance_km).toFixed(1) : '-'} km away</span>
                       {m.hourly_rate && <span>{CURRENCY}{m.hourly_rate}/hr</span>}
@@ -728,6 +827,20 @@ export default function UserDashboard() {
                   })
                 )}
               </div>
+              {!mechanicsNearbyLoading &&
+                mechanicsList.length > 0 &&
+                filteredMechanics.length > 0 &&
+                filteredMechanics.length > mechanicsVisibleCount && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary mechanics-show-more"
+                    onClick={() =>
+                      setMechanicsVisibleCount((c) => Math.min(c + MECHANICS_INCREMENT, filteredMechanics.length))
+                    }
+                  >
+                    Show more ({filteredMechanics.length - mechanicsVisibleCount} remaining)
+                  </button>
+                )}
 
               <form onSubmit={handleBook} className="booking-form">
                 <h4>Vehicle Details</h4>
@@ -793,9 +906,25 @@ export default function UserDashboard() {
                   <p className="total">Total: {CURRENCY}{totalPrice}</p>
                 </div>
 
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? 'Booking...' : 'Request Service'}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={loading || mechanicsNearbyLoading || mechanicsList.length === 0}
+                >
+                  {loading
+                    ? 'Booking...'
+                    : mechanicsNearbyLoading
+                      ? 'Checking mechanics…'
+                      : mechanicsList.length === 0
+                        ? 'No mechanics in your area'
+                        : 'Request Service'}
                 </button>
+                {!mechanicsNearbyLoading && mechanicsList.length === 0 && (
+                  <p className="auth-muted" style={{ marginTop: '0.75rem', fontSize: '0.9rem' }}>
+                    There are no available mechanics within 10 km. You cannot place a request until at least one is
+                    nearby.
+                  </p>
+                )}
               </form>
             </div>
           )}

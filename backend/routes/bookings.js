@@ -5,6 +5,9 @@ import { notifyMechanicsNearby } from '../services/push.js';
 import { sendBookingPush, getCategoryName, payloadForBooking } from '../services/bookingNotifications.js';
 import { sendBookingInvoiceEmail } from '../services/email.service.js';
 
+/** Same radius as GET /mechanics/nearby and GET /bookings/available */
+const NEARBY_RADIUS_KM = 10;
+
 const router = express.Router();
 
 router.post('/', authenticate, requireRole('user'), async (req, res) => {
@@ -23,6 +26,43 @@ router.post('/', authenticate, requireRole('user'), async (req, res) => {
 
     if (!['emergency', 'scheduled'].includes(serviceType)) {
       return res.status(400).json({ error: 'serviceType must be emergency or scheduled' });
+    }
+
+    const userLat = parseFloat(userLatitude);
+    const userLng = parseFloat(userLongitude);
+    if (Number.isNaN(userLat) || Number.isNaN(userLng)) {
+      return res.status(400).json({ error: 'Valid userLatitude and userLongitude are required' });
+    }
+
+    const chosenMechanicId = mechanicId || null;
+    if (chosenMechanicId) {
+      const mv = await query(
+        `SELECT m.id FROM mechanics m
+         WHERE m.id = $1
+           AND m.latitude IS NOT NULL AND m.longitude IS NOT NULL
+           AND m.is_available = true
+           AND distance_km(m.latitude::decimal, m.longitude::decimal, $2, $3) <= $4`,
+        [chosenMechanicId, userLat, userLng, NEARBY_RADIUS_KM]
+      );
+      if (!mv.rows.length) {
+        return res.status(400).json({
+          error:
+            'That mechanic is not available or is outside your service area. Pick another mechanic or clear your selection.',
+        });
+      }
+    } else {
+      const cnt = await query(
+        `SELECT COUNT(*)::int AS c FROM mechanics m
+         WHERE m.latitude IS NOT NULL AND m.longitude IS NOT NULL
+           AND m.is_available = true
+           AND distance_km(m.latitude::decimal, m.longitude::decimal, $1, $2) <= $3`,
+        [userLat, userLng, NEARBY_RADIUS_KM]
+      );
+      if (!cnt.rows[0]?.c) {
+        return res.status(400).json({
+          error: 'No mechanics are available in your area right now. Try again later.',
+        });
+      }
     }
 
     const pm = paymentMethod === 'online' ? 'online' : 'cod';
@@ -46,8 +86,8 @@ router.post('/', authenticate, requireRole('user'), async (req, res) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
       RETURNING *`,
       [
-        req.user.id, mechanicId || null, categoryId, serviceType,
-        parseFloat(userLatitude), parseFloat(userLongitude), userAddress || null,
+        req.user.id, chosenMechanicId, categoryId, serviceType,
+        userLat, userLng, userAddress || null,
         serviceType === 'scheduled' && scheduledAt ? scheduledAt : null,
         description || null, vehicleImage || null, vehicleNumber || null,
         vehicleMake || null, vehicleModel || null, vehicleYear ? parseInt(vehicleYear, 10) : null,
@@ -66,7 +106,7 @@ router.post('/', authenticate, requireRole('user'), async (req, res) => {
         'Booking submitted',
         `Your ${catName} request was received. We'll notify you when it's confirmed.`
       ),
-      mechanicPayload: mechanicId
+      mechanicPayload: chosenMechanicId
         ? payloadForBooking(
             booking.id,
             'New booking',
@@ -75,10 +115,10 @@ router.post('/', authenticate, requireRole('user'), async (req, res) => {
         : null,
     }).catch(() => {});
 
-    if (!mechanicId) {
+    if (!chosenMechanicId) {
       notifyMechanicsNearby(
-        parseFloat(userLatitude),
-        parseFloat(userLongitude),
+        userLat,
+        userLng,
         payloadForBooking(
           booking.id,
           'New service request',
