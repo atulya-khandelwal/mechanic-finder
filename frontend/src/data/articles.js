@@ -13,7 +13,7 @@ const articles = [
     keywords: 'car breakdown, vehicle broke down, car stopped working, roadside emergency, what to do car breakdown',
     category: 'emergency',
     readTime: 6,
-    date: '2025-12-10',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Stay Calm and Get to Safety',
@@ -44,7 +44,7 @@ const articles = [
     keywords: 'flat tire, tire puncture, change tire, spare tire, tire repair, tire replacement, flat tire repair near me',
     category: 'emergency',
     readTime: 5,
-    date: '2025-12-15',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Signs of a Flat Tire',
@@ -71,7 +71,7 @@ const articles = [
     keywords: 'dead battery, car won\'t start, jump start, battery replacement, car battery near me, battery jump start',
     category: 'emergency',
     readTime: 5,
-    date: '2025-12-20',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Signs Your Battery Is Dying',
@@ -94,7 +94,7 @@ const articles = [
     keywords: 'engine overheating, car overheating, temperature gauge high, coolant leak, radiator problem, engine overheat what to do',
     category: 'emergency',
     readTime: 6,
-    date: '2025-12-25',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Why Engines Overheat',
@@ -117,7 +117,7 @@ const articles = [
     keywords: 'brake warning signs, brake noise, squealing brakes, grinding brakes, brake pad replacement, brake repair, brake service near me',
     category: 'scheduled',
     readTime: 5,
-    date: '2026-01-05',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Squealing or Squeaking When Braking',
@@ -156,7 +156,7 @@ const articles = [
     keywords: 'oil change, engine oil, when to change oil, oil change near me, synthetic oil, oil change interval, car service',
     category: 'scheduled',
     readTime: 5,
-    date: '2026-01-15',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Why Oil Changes Matter',
@@ -183,7 +183,7 @@ const articles = [
     keywords: 'car ac not cooling, ac not cold, car ac repair, ac gas refill, ac compressor, car ac service near me',
     category: 'scheduled',
     readTime: 5,
-    date: '2026-02-01',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Why Your Car AC Stops Cooling',
@@ -210,7 +210,7 @@ const articles = [
     keywords: 'car making noise, car squealing, grinding noise car, knocking sound engine, car clicking noise, car noise diagnosis',
     category: 'emergency',
     readTime: 6,
-    date: '2026-02-10',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Squealing from the Engine Bay',
@@ -245,7 +245,7 @@ const articles = [
     keywords: 'pre trip checklist, road trip checklist, vehicle inspection, car check before trip, long drive preparation, vehicle safety check',
     category: 'scheduled',
     readTime: 5,
-    date: '2026-02-20',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Tires: Pressure, Tread, and Spare',
@@ -280,7 +280,7 @@ const articles = [
     keywords: 'when to call mechanic, DIY car repair, car problems fix yourself, mobile mechanic when needed, car repair guide',
     category: 'scheduled',
     readTime: 6,
-    date: '2026-03-01',
+    date: '2026-04-17',
     sections: [
       {
         heading: 'Safe DIY: Things You Can Do Yourself',

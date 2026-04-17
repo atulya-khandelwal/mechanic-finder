@@ -118,14 +118,16 @@ export async function requestSignupOtp({ email, password, fullName, phone, role 
     throw e;
   }
 
-  try {
-    await sendVerificationSms(normalizedPhone);
-  } catch (e) {
-    await query('DELETE FROM signup_verifications WHERE email = $1', [normalized]);
-    throw e;
+  if (config.phoneOtpEnabled) {
+    try {
+      await sendVerificationSms(normalizedPhone);
+    } catch (e) {
+      await query('DELETE FROM signup_verifications WHERE email = $1', [normalized]);
+      throw e;
+    }
   }
 
-  return { email: normalized, expiresAt };
+  return { email: normalized, expiresAt, phoneOtpRequired: config.phoneOtpEnabled };
 }
 
 /**
@@ -180,7 +182,7 @@ export async function resendSignupOtp(email) {
     throw e;
   }
 
-  if (row.rows[0].phone) {
+  if (config.phoneOtpEnabled && row.rows[0].phone) {
     try {
       await sendVerificationSms(row.rows[0].phone);
     } catch (e) {
@@ -188,7 +190,7 @@ export async function resendSignupOtp(email) {
     }
   }
 
-  return { email: normalized, expiresAt };
+  return { email: normalized, expiresAt, phoneOtpRequired: config.phoneOtpEnabled };
 }
 
 /**
@@ -204,7 +206,7 @@ export async function verifySignupOtp(email, emailCode, phoneCode) {
     err.status = 400;
     throw err;
   }
-  if (!rawPhoneCode) {
+  if (config.phoneOtpEnabled && !rawPhoneCode) {
     const err = new Error('SMS verification code is required');
     err.status = 400;
     throw err;
@@ -267,21 +269,23 @@ export async function verifySignupOtp(email, emailCode, phoneCode) {
       throw err;
     }
 
-    let phoneOk;
-    try {
-      phoneOk = await checkVerificationCode(p.phone, rawPhoneCode);
-    } catch (twilioErr) {
-      await client.query('ROLLBACK');
-      transactionEnded = true;
-      throw twilioErr;
-    }
+    if (config.phoneOtpEnabled) {
+      let phoneOk;
+      try {
+        phoneOk = await checkVerificationCode(p.phone, rawPhoneCode);
+      } catch (twilioErr) {
+        await client.query('ROLLBACK');
+        transactionEnded = true;
+        throw twilioErr;
+      }
 
-    if (!phoneOk) {
-      await client.query('ROLLBACK');
-      transactionEnded = true;
-      const err = new Error('Invalid SMS verification code');
-      err.status = 401;
-      throw err;
+      if (!phoneOk) {
+        await client.query('ROLLBACK');
+        transactionEnded = true;
+        const err = new Error('Invalid SMS verification code');
+        err.status = 401;
+        throw err;
+      }
     }
 
     let userResult;

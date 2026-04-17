@@ -27,10 +27,13 @@ const router = express.Router();
 router.post('/register/start', async (req, res) => {
   try {
     const { email, password, fullName, phone, role = 'user' } = req.body;
-    await requestSignupOtp({ email, password, fullName, phone, role });
+    const result = await requestSignupOtp({ email, password, fullName, phone, role });
     res.status(200).json({
-      message: 'Verification codes sent to your email and phone (SMS).',
+      message: result.phoneOtpRequired
+        ? 'Verification codes sent to your email and phone (SMS).'
+        : 'Verification code sent to your email.',
       email: String(email).trim().toLowerCase(),
+      phoneOtpRequired: result.phoneOtpRequired,
     });
   } catch (err) {
     const status = err.status || 500;

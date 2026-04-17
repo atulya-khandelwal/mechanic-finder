@@ -28,6 +28,7 @@ export default function Register() {
   });
   const [code, setCode] = useState('');
   const [phoneCode, setPhoneCode] = useState('');
+  const [phoneOtpRequired, setPhoneOtpRequired] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -53,9 +54,14 @@ export default function Register() {
     }
     setSubmitting(true);
     try {
-      await registerStart({ ...form, phone: phoneCheck.e164 });
+      const res = await registerStart({ ...form, phone: phoneCheck.e164 });
+      setPhoneOtpRequired(!!res.phoneOtpRequired);
       setStep(2);
-      setInfo('Enter the code from your email and the SMS code sent to your phone.');
+      setInfo(
+        res.phoneOtpRequired
+          ? 'Enter the code from your email and the SMS code sent to your phone.'
+          : 'Enter the verification code sent to your email.'
+      );
     } catch (err) {
       setError(formatRegisterStartError(err));
       if (err.retryAfterSeconds != null) {
@@ -152,8 +158,12 @@ export default function Register() {
         {step === 2 && (
           <form onSubmit={handleVerify}>
             <p className="auth-muted">
-              Email code sent to <strong>{form.email.trim()}</strong>. SMS code sent to{' '}
-              <strong>{form.phone.trim() || 'your phone'}</strong>.
+              {phoneOtpRequired ? (
+                <>Email code sent to <strong>{form.email.trim()}</strong>. SMS code sent to{' '}
+                <strong>{form.phone.trim() || 'your phone'}</strong>.</>
+              ) : (
+                <>Verification code sent to <strong>{form.email.trim()}</strong>.</>
+              )}
             </p>
             <label className="auth-field-label" htmlFor="reg-email-code">
               Email code
@@ -168,19 +178,23 @@ export default function Register() {
               onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
               required
             />
-            <label className="auth-field-label" htmlFor="reg-sms-code">
-              SMS code
-            </label>
-            <input
-              id="reg-sms-code"
-              name="phoneCode"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="Code from SMS"
-              value={phoneCode}
-              onChange={(e) => setPhoneCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
-              required
-            />
+            {phoneOtpRequired && (
+              <>
+                <label className="auth-field-label" htmlFor="reg-sms-code">
+                  SMS code
+                </label>
+                <input
+                  id="reg-sms-code"
+                  name="phoneCode"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="Code from SMS"
+                  value={phoneCode}
+                  onChange={(e) => setPhoneCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                  required
+                />
+              </>
+            )}
             {error && <p className="error">{error}</p>}
             {info && <p className="auth-info">{info}</p>}
             <button type="submit" className="btn btn-primary" disabled={submitting}>

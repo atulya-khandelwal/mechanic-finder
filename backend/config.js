@@ -22,6 +22,11 @@ export const config = {
   /** ISO 3166-1 alpha-2 when user omits country code (e.g. IN, US) */
   defaultPhoneRegion: process.env.DEFAULT_PHONE_REGION || 'IN',
   /**
+   * Master flag: enable/disable phone OTP during signup.
+   * Set to 'true' to require SMS verification, 'false' to skip it entirely.
+   */
+  phoneOtpEnabled: process.env.PHONE_OTP_ENABLED === 'true' || process.env.PHONE_OTP_ENABLED === '1',
+  /**
    * Non-production only: allow signup without Twilio credentials (accepts any 4–8 digit SMS code).
    * Never enable in production.
    */
