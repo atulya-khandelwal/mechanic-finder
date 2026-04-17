@@ -175,6 +175,17 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Knowledge Base teaser ── */}
+      <section className="landing-section" aria-labelledby="kb-heading">
+        <div className="landing-container" style={{ textAlign: 'center' }}>
+          <h2 id="kb-heading" className="landing-section-title">Learn About Your Vehicle</h2>
+          <p className="landing-section-sub">Free guides and expert advice for every situation</p>
+          <Link to="/knowledge-base" className="btn btn-primary landing-btn-lg">
+            Browse Knowledge Base
+          </Link>
+        </div>
+      </section>
+
       {/* ── CTA ── */}
       <section className="landing-cta">
         <div className="landing-container">

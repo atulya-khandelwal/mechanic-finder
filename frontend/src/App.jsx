@@ -11,6 +11,8 @@ import MechanicDashboard from './pages/MechanicDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LocationGate from './pages/LocationGate';
 import LandingPage from './pages/LandingPage';
+import KnowledgeBase from './pages/KnowledgeBase';
+import Article from './pages/Article';
 import './App.css';
 
 function PrivateRoute({ children, allowedRoles }) {
@@ -32,6 +34,8 @@ function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/knowledge-base" element={<KnowledgeBase />} />
+      <Route path="/knowledge-base/:slug" element={<Article />} />
       <Route
         path="/admin"
         element={

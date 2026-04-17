@@ -16,7 +16,23 @@ import puppeteer from 'puppeteer';
 
 const DIST = resolve(import.meta.dirname, '..', 'dist');
 const PORT = 4199;
-const ROUTES = ['/', '/login', '/register', '/forgot-password'];
+const ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/knowledge-base',
+  '/knowledge-base/car-breakdown-what-to-do',
+  '/knowledge-base/flat-tire-repair-guide',
+  '/knowledge-base/car-battery-dead-jump-start',
+  '/knowledge-base/engine-overheating-causes-solutions',
+  '/knowledge-base/brake-warning-signs',
+  '/knowledge-base/oil-change-guide',
+  '/knowledge-base/car-ac-not-cooling',
+  '/knowledge-base/strange-car-noises-diagnosis',
+  '/knowledge-base/pre-trip-vehicle-checklist',
+  '/knowledge-base/when-to-call-mechanic-vs-diy',
+];
 
 const MIME = {
   '.html': 'text/html',
