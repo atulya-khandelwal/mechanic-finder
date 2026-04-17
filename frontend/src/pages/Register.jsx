@@ -8,8 +8,10 @@ import {
   formatIndianPhoneFieldValue,
 } from '../utils/phoneValidation';
 import { formatRegisterStartError, formatRegisterVerifyError } from '../utils/authErrors';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 export default function Register() {
+  useDocumentTitle('Create Account');
   const { user } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
@@ -101,7 +103,7 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-page">
+    <main className="auth-page">
       <ThemeToggle />
       <div className="auth-card">
         <h1>Mobile Mechanic</h1>
@@ -205,6 +207,6 @@ export default function Register() {
 
         <p className="auth-link">Already have an account? <Link to="/login">Sign In</Link></p>
       </div>
-    </div>
+    </main>
   );
 }

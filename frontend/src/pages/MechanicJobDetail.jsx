@@ -213,7 +213,7 @@ export default function MechanicJobDetail({ bookingId, onRefresh }) {
               )}
             </dl>
             {booking.vehicle_image && (
-              <img src={resolvePublicUrl(booking.vehicle_image)} alt="Customer vehicle" className="booking-detail-vehicle-img" />
+              <img src={resolvePublicUrl(booking.vehicle_image)} alt="Customer vehicle" className="booking-detail-vehicle-img" loading="lazy" />
             )}
           </div>
         )}

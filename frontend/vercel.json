@@ -1,6 +1,16 @@
 {
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [{ "key": "Content-Type", "value": "application/xml" }]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [{ "key": "Content-Type", "value": "text/plain" }]
+    }
+  ],
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://mechanic-finder-x56w.onrender.com/api/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!sitemap\\.xml|robots\\.txt|og-image\\.png|pwa-.*\\.png|sw\\.js|workbox-.*\\.js|manifest\\.webmanifest).*)", "destination": "/index.html" }
   ]
 }

@@ -208,7 +208,7 @@ export default function UserBookingDetail({ bookingId, onLeaveReview }) {
             <p>{[booking.vehicle_make, booking.vehicle_model, booking.vehicle_year].filter(Boolean).join(' ')}</p>
           )}
           {booking.vehicle_image && (
-            <img src={resolvePublicUrl(booking.vehicle_image)} alt="Vehicle" className="booking-detail-vehicle-img" />
+            <img src={resolvePublicUrl(booking.vehicle_image)} alt="Vehicle" className="booking-detail-vehicle-img" loading="lazy" />
           )}
         </div>
 

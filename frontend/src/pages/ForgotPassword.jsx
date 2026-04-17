@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
 import { auth as authApi } from '../api';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 export default function ForgotPassword() {
+  useDocumentTitle('Forgot Password');
   const { user } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="auth-page">
+    <main className="auth-page">
       <ThemeToggle />
       <div className="auth-card">
         <h1>Mobile Mechanic</h1>
@@ -77,6 +79,6 @@ export default function ForgotPassword() {
           </p>
         )}
       </div>
-    </div>
+    </main>
   );
 }

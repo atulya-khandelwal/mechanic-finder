@@ -8,8 +8,10 @@ import {
   formatLoginIdentifierInput,
 } from '../utils/phoneValidation';
 import { formatLoginError } from '../utils/authErrors';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 export default function Login() {
+  useDocumentTitle('Login');
   const { user } = useAuth();
   const navigate = useNavigate();
   useEffect(() => { if (user) navigate('/'); }, [user, navigate]);
@@ -45,7 +47,7 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
+    <main className="auth-page">
       <ThemeToggle />
       <div className="auth-card">
         <h1>Mobile Mechanic</h1>
@@ -80,6 +82,6 @@ export default function Login() {
         </p>
         <p className="auth-link">Don't have an account? <Link to="/register">Register as User or Mechanic</Link></p>
       </div>
-    </div>
+    </main>
   );
 }

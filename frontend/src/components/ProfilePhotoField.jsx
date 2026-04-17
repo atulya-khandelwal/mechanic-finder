@@ -59,7 +59,7 @@ export default function ProfilePhotoField({ user, onUpdated }) {
       <div className="mws-profile-photo-row">
         <div className="mws-profile-avatar" aria-hidden>
           {user?.profile_photo ? (
-            <img src={resolvePublicUrl(user.profile_photo)} alt="" />
+            <img src={resolvePublicUrl(user.profile_photo)} alt="Profile photo" />
           ) : (
             <span className="mws-profile-avatar-placeholder">{initialsFromName(user?.full_name)}</span>
           )}

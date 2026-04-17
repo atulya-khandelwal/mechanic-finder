@@ -10,6 +10,7 @@ import UserDashboard from './pages/UserDashboard';
 import MechanicDashboard from './pages/MechanicDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LocationGate from './pages/LocationGate';
+import LandingPage from './pages/LandingPage';
 import './App.css';
 
 function PrivateRoute({ children, allowedRoles }) {
@@ -86,7 +87,7 @@ function AppRoutes() {
 function NavigateToRole() {
   const { user, loading } = useAuth();
   if (loading) return <div className="loading">Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <LandingPage />;
   if (user.role === 'admin') return <Navigate to="/admin" replace />;
   if (user.role === 'mechanic') return <Navigate to="/mechanic/overview" replace />;
   return <Navigate to="/user/find" replace />;

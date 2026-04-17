@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { admin } from '../api';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 export default function AdminDashboard() {
+  useDocumentTitle('Admin Dashboard');
   const { logout } = useAuth();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
@@ -112,7 +114,7 @@ export default function AdminDashboard() {
       {tab === 'users' && (
         <div className="section-with-form">
           <div className="section-header">
-            <h3>App Users (customers)</h3>
+            <h2>App Users (customers)</h2>
             <button className="btn btn-primary" onClick={() => setShowAddUser(true)}>+ Add User</button>
           </div>
           {showAddUser && (
@@ -157,7 +159,7 @@ export default function AdminDashboard() {
       {tab === 'mechanics' && (
         <div className="section-with-form">
           <div className="section-header">
-            <h3>Mechanics</h3>
+            <h2>Mechanics</h2>
             <button className="btn btn-primary" onClick={() => setShowAddMechanic(true)}>+ Add Mechanic</button>
           </div>
           {showAddMechanic && (

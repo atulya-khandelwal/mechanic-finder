@@ -19,6 +19,7 @@ import {
   formatIndianPhoneFieldValue,
   e164ToIndianDisplay,
 } from '../utils/phoneValidation';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const BASE_CHARGE = 25;
 const HOME_SERVICE_FEE = 15;
@@ -30,6 +31,7 @@ const MECHANICS_INITIAL_VISIBLE = 12;
 const MECHANICS_INCREMENT = 12;
 
 export default function UserDashboard() {
+  useDocumentTitle('Find Mechanics Near You');
   const mapsDeviceHint = getMapsDeviceHint();
   const { location, clearLocation } = useLoc();
   const { user, refreshUser, logout } = useAuth();
@@ -847,7 +849,7 @@ export default function UserDashboard() {
                 <label>Vehicle Image</label>
                 <input type="file" accept="image/*" onChange={handleImageChange} />
                 {vehicleImageUrl && (
-                  <img src={resolvePublicUrl(vehicleImageUrl)} alt="Vehicle" className="vehicle-preview" />
+                  <img src={resolvePublicUrl(vehicleImageUrl)} alt="Vehicle" className="vehicle-preview" loading="lazy" />
                 )}
                 <input placeholder="Vehicle Number (Plate)" value={vehicleNumber} onChange={(e) => setVehicleNumber(e.target.value)} required />
                 <input placeholder="Make (e.g. Honda, Toyota)" value={vehicleMake} onChange={(e) => setVehicleMake(e.target.value)} />

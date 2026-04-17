@@ -23,6 +23,7 @@ import {
   formatIndianPhoneFieldValue,
   e164ToIndianDisplay,
 } from '../utils/phoneValidation';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const CURRENCY = '₹';
 
@@ -45,6 +46,7 @@ function StatCard({ label, value, sub }) {
 }
 
 export default function MechanicDashboard() {
+  useDocumentTitle('Mechanic Dashboard');
   const narrowTopbar = useMediaQuery('(max-width: 899px)');
   const { user, refreshUser, logout } = useAuth();
   const { tab: tabParam, bookingId } = useParams();

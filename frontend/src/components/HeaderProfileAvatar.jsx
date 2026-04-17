@@ -25,7 +25,7 @@ export default function HeaderProfileAvatar({ user, to, onNavigate }) {
       onClick={() => onNavigate?.()}
     >
       {showImg ? (
-        <img src={resolvePublicUrl(user.profile_photo)} alt="" onError={() => setImgErr(true)} />
+        <img src={resolvePublicUrl(user.profile_photo)} alt="Profile photo" onError={() => setImgErr(true)} />
       ) : (
         <span className="mws-header-avatar-placeholder" aria-hidden>
           {initials}

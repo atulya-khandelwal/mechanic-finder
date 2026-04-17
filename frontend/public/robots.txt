@@ -1,0 +1,15 @@
+# Mobile Mechanic - robots.txt
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /register
+
+# Private routes - no indexing needed
+Disallow: /user/
+Disallow: /mechanic/
+Disallow: /admin
+Disallow: /reset-password
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://mobilemechanic.atulyakhandelwal.in/sitemap.xml

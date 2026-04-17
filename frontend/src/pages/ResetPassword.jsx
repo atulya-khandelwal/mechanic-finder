@@ -3,8 +3,10 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
 import { auth as authApi } from '../api';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 export default function ResetPassword() {
+  useDocumentTitle('Reset Password');
   const { user, applyAuthToken } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -48,7 +50,7 @@ export default function ResetPassword() {
 
   if (!tokenFromUrl) {
     return (
-      <div className="auth-page">
+      <main className="auth-page">
         <ThemeToggle />
         <div className="auth-card">
           <h1>Mobile Mechanic</h1>
@@ -58,12 +60,12 @@ export default function ResetPassword() {
             <Link to="/forgot-password">Request a new link</Link> · <Link to="/login">Sign in</Link>
           </p>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="auth-page">
+    <main className="auth-page">
       <ThemeToggle />
       <div className="auth-card">
         <h1>Mobile Mechanic</h1>
@@ -98,6 +100,6 @@ export default function ResetPassword() {
           <Link to="/login">Back to sign in</Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }
